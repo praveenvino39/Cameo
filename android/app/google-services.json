@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "855295885509",
+    "firebase_url": "https://keepx-de292-default-rtdb.firebaseio.com",
+    "project_id": "keepx-de292",
+    "storage_bucket": "keepx-de292.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:855295885509:android:047f5aefb0572c375670ac",
+        "android_client_info": {
+          "package_name": "com.example.cameo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "855295885509-ulf6m726eq19bme9pv4ba2vufb529a8a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBDi2a0n3m5CxgWsBjKa0hdhBATqeV_9G8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "855295885509-ulf6m726eq19bme9pv4ba2vufb529a8a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

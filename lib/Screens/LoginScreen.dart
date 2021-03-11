@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cameo/Network/userSesionHelper.dart';
 import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
+import 'package:cameo/providers/user_provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:cameo/utils.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:cameo/constants.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:cameo/Network/networkHelper.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -27,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   FocusNode fnPassword = FocusNode();
   @override
   Widget build(BuildContext context) {
+    var userProvider = Provider.of<UserProvider>(context);
     return SafeArea(
       child: Scaffold(
         body: Container(
@@ -76,7 +79,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 FlatButton(
-                  onPressed: () => validateAndLogin(email, password),
+                  onPressed: () =>
+                      validateAndLogin(email, password, userProvider),
                   child: Text(
                     'Login',
                     style: TextStyle(
@@ -113,7 +117,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  validateAndLogin(String email, String password) async {
+  validateAndLogin(
+      String email, String password, UserProvider userProvider) async {
     bool isValid = _formKey.currentState.validate();
     if (isValid) {
       loading(context);
@@ -123,7 +128,9 @@ class _LoginScreenState extends State<LoginScreen> {
       Map data = jsonDecode(res.body);
       switch (data["code"]) {
         case 200:
-          userSession.presistUser(token: data["data"][0]["userid"]);
+          userSession.presistUser(
+              token: data["data"][0]["userid"],
+              username: data["data"][0]["username"]);
           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
           break;
         case 404:

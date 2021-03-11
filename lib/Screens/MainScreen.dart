@@ -1,4 +1,5 @@
 import 'package:cameo/MockData/data.dart';
+import 'package:cameo/Network/userSesionHelper.dart';
 import 'package:cameo/Screens/SearchResult.dart';
 import 'package:cameo/Widgets/CustomAppBar.dart';
 import 'package:cameo/Widgets/CustomDrawer.dart';
@@ -6,22 +7,33 @@ import 'package:cameo/Widgets/CustomSection.dart';
 import 'package:cameo/Widgets/Popups%20and%20Dialogs/SearchAlertDialog.dart';
 import 'package:cameo/Widgets/Teaser.dart';
 import 'package:cameo/constants.dart';
+import 'package:cameo/providers/user_provider.dart';
+import 'package:flutter/src/material/refresh_indicator.dart' as baseRefresh;
 import 'package:cameo/utils.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cameo/Network/networkHelper.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => false;
   List popularCameo;
   ApiHelper apiHelper = ApiHelper();
   List latestCameo;
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  FlutterSecureStorage _storage = FlutterSecureStorage();
+  UserSession _userSession = UserSession();
+  final GlobalKey<baseRefresh.RefreshIndicatorState> _refreshIndicatorKey =
+      new GlobalKey<baseRefresh.RefreshIndicatorState>();
   @override
   void initState() {
     // TODO: implement initState
@@ -68,129 +80,138 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
       backgroundColor: kBodyBackgroundColor,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(child: Teaser()),
-            //To Render Popular Cameos
-            FutureBuilder(
-                future: apiHelper.popularCameos(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return CustomSection(
-                      title: 'Popular',
-                      cardItems: snapshot.data,
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    print(snapshot.error);
-                    return Center(
-                      child: ListTile(
-                        leading: Icon(Icons.error),
-                        title: Text(
-                          "Something went wrong",
-                          style: TextStyle(color: Colors.white, fontSize: 22),
-                        ),
-                      ),
-                    );
-                  } else
-                    return Container(
-                      height: 280,
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                }),
-            //To Render Latest Cameos
-            FutureBuilder(
-                future: apiHelper.latestCameo(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return CustomSection(
-                      title: 'Latest',
-                      cardItems: snapshot.data,
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    print(snapshot.error);
-                    return Center(
-                      child: ListTile(
-                        leading: Icon(Icons.error),
-                        title: Text(
-                          "Something went wrong",
-                          style: TextStyle(color: Colors.white, fontSize: 22),
-                        ),
-                      ),
-                    );
-                  } else
-                    return Column(
-                      children: [
-                        Container(
-                          height: 280,
-                          child: Center(
-                            child: CircularProgressIndicator(),
+      body: baseRefresh.RefreshIndicator(
+        color: kSecondaryColor,
+        backgroundColor: Colors.white,
+        onRefresh: () async {
+          await apiHelper.popularCameos();
+          setState(() {});
+        },
+        key: _refreshIndicatorKey,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(child: Teaser()),
+              //To Render Popular Cameos
+              FutureBuilder(
+                  future: apiHelper.popularCameos(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return CustomSection(
+                        title: 'Popular',
+                        cardItems: snapshot.data,
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      print(snapshot.error);
+                      return Center(
+                        child: ListTile(
+                          leading: Icon(Icons.error),
+                          title: Text(
+                            "Something went wrong",
+                            style: TextStyle(color: Colors.white, fontSize: 22),
                           ),
                         ),
-                      ],
-                    );
-                }),
-            Container(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(left: 13),
-                    width: MediaQuery.of(context).size.width / 1.5,
-                    child: Text(
-                      "Categories",
-                      style: kSeactionTitle,
+                      );
+                    } else
+                      return Container(
+                        height: 280,
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                  }),
+              //To Render Latest Cameos
+              FutureBuilder(
+                  future: apiHelper.latestCameo(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return CustomSection(
+                        title: 'Latest',
+                        cardItems: snapshot.data,
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      print(snapshot.error);
+                      return Center(
+                        child: ListTile(
+                          leading: Icon(Icons.error),
+                          title: Text(
+                            "Something went wrong",
+                            style: TextStyle(color: Colors.white, fontSize: 22),
+                          ),
+                        ),
+                      );
+                    } else
+                      return Column(
+                        children: [
+                          Container(
+                            height: 280,
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                        ],
+                      );
+                  }),
+              Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(left: 13),
+                      width: MediaQuery.of(context).size.width / 1.5,
+                      child: Text(
+                        "Categories",
+                        style: kSeactionTitle,
+                      ),
                     ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(top: 10),
-                    height: 100,
-                    child: ListView.builder(
-                        itemCount: categories.length,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) => Container(
-                              margin: EdgeInsets.symmetric(horizontal: 10),
-                              width: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Stack(children: [
-                                Container(
-                                  clipBehavior: Clip.hardEdge,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5)),
-                                  child: Image(
-                                    image:
-                                        NetworkImage(categories[index]["url"]),
-                                    fit: BoxFit.cover,
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      height: 100,
+                      child: ListView.builder(
+                          itemCount: categories.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) => Container(
+                                margin: EdgeInsets.symmetric(horizontal: 10),
+                                width: 200,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Stack(children: [
+                                  Container(
+                                    clipBehavior: Clip.hardEdge,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5)),
+                                    child: Image(
+                                      image: NetworkImage(
+                                          categories[index]["url"]),
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
-                                ),
-                                Container(
-                                  width: 200,
-                                  height: 150,
-                                  color: Color.fromARGB(70, 19, 20, 49),
-                                ),
-                                Positioned(
-                                    top: 10,
-                                    left: 10,
-                                    child: Text(
-                                      categories[index]["title"],
-                                      style: kCategoryTitle,
-                                    )),
-                              ]),
-                            )),
-                  )
-                ],
+                                  Container(
+                                    width: 200,
+                                    height: 150,
+                                    color: Color.fromARGB(70, 19, 20, 49),
+                                  ),
+                                  Positioned(
+                                      top: 10,
+                                      left: 10,
+                                      child: Text(
+                                        categories[index]["title"],
+                                        style: kCategoryTitle,
+                                      )),
+                                ]),
+                              )),
+                    )
+                  ],
+                ),
               ),
-            ),
-            //Invisible sizedbox to align main axis element
-            width(MediaQuery.of(context).size.width)
-          ],
+              //Invisible sizedbox to align main axis element
+              width(MediaQuery.of(context).size.width)
+            ],
+          ),
         ),
       ),
     );

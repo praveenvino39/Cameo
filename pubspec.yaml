@@ -11,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^0.1.2
+  data_connection_checker: ^0.3.4
   date_range_picker: ^1.0.6
   flutter_secure_storage: ^3.3.5
   flutter_svg: null
@@ -20,17 +21,35 @@ dependencies:
   http: ^0.12.2
   intl: ^0.16.1
   recase: ^3.0.1
-  rflutter_alert: ^1.1.0
   rich_alert: ^0.1.32
-  share: ^0.6.5+4
   transparent_image: ^1.0.0
   video_player: ^1.0.1
-  flutter_displaymode: ^0.1.1
-  data_connection_checker: ^0.3.4
+  material_floating_search_bar: ^0.2.6
+  provider:
+  dio: ^3.0.10
+  image_picker: ^0.6.7+22
+  file_picker: ^2.1.6
+  shimmer: ^1.1.2
+  mime_type: ^0.3.2
+  permission_handler: ^5.1.0+2
+  path_provider: ^1.6.27
+  flutter_chat_bubble: ^1.0.2
+  cached_network_image: ^2.5.0
+  video_thumbnail: ^0.2.5+1
+  youtube_player_flutter: ^7.0.0+7
+  vimeoplayer: ^0.1.8
+  flutter_native_splash: 0.2.9
+  get: ^3.26.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+flutter_native_splash:
+  image: assets/images/splashscreen.png
+  color: 000000
+  android: true
+  ios: true
 
 flutter:
   uses-material-design: true

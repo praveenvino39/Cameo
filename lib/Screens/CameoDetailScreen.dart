@@ -1,13 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cameo/Network/networkHelper.dart';
 import 'package:cameo/Network/userSesionHelper.dart';
 import 'package:cameo/Screens/ChatScreen.dart';
+import 'package:cameo/Screens/EditCameoScreen.dart';
 import 'package:cameo/Widgets/CameoInfoCardContainer.dart';
 import 'package:cameo/Widgets/Popups%20and%20Dialogs/PaymentPopup.dart';
-import 'package:cameo/Widgets/SvgButton.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:cameo/Widgets/Shimmers/CameoDetailShimmer.dart';
 import 'package:cameo/constants.dart';
 import 'package:cameo/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:video_player/video_player.dart';
+import 'package:vimeoplayer/vimeoplayer.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class CameoDetailScreen extends StatefulWidget {
   final int id;
@@ -23,14 +30,20 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
   final ApiHelper apiHelper = ApiHelper();
   final String imageBaseUrl = 'https://cameo.deliveryventure.com/';
   UserSession userSession = UserSession();
-  int currentUserId;
+  String currentUserId;
+  VideoPlayerController _videController;
+  YoutubePlayerController _controller;
 
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
-    userSession.getCurrentUserId().then((value) => setState(() {
-          currentUserId = int.parse(value);
-        }));
+    _videController = VideoPlayerController.network(
+        'https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4')
+      ..initialize().then((_) {
+        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+        setState(() {});
+      });
   }
 
   @override
@@ -50,7 +63,17 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) if (snapshot
                         .data["data"][0]["gigs_details"].length >
-                    0)
+                    0) {
+                  Uri youtubeVideoId =
+                      Uri.parse('https://www.youtube.com/watch?v=i74Lxs9Zjhg');
+
+                  _controller = YoutubePlayerController(
+                    initialVideoId: youtubeVideoId.queryParameters["v"],
+                    flags: YoutubePlayerFlags(
+                      autoPlay: false,
+                      mute: false,
+                    ),
+                  );
                   return SingleChildScrollView(
                     child: Column(
                       children: [
@@ -68,7 +91,7 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                                   children: [
                                     CircleAvatar(
                                       radius: 56,
-                                      backgroundImage: NetworkImage(
+                                      backgroundImage: CachedNetworkImageProvider(
                                           '$imageBaseUrl${snapshot.data["data"][0]["gigs_details"]["image"]}'),
                                     ),
                                     width(20.0),
@@ -145,62 +168,246 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                             clipBehavior: Clip.hardEdge,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(100)),
-                            child: FlatButton(
-                              onPressed: () {
-                                return showDialog(
-                                  context: context,
-                                  builder: (context) => PaymentPopup(
-                                    price: double.parse(snapshot.data["data"][0]
-                                        ["gigs_details"]["gig_price"]),
-                                    paymentTo: int.parse(snapshot.data["data"]
-                                        [0]["gigs_details"]["id"]),
-                                    paymentFrom: 10,
-                                  ),
+                            child: FutureBuilder(
+                                future: UserSession().getCurrentUserId(),
+                                builder: (context, userSnapshot) {
+                                  if (userSnapshot.hasData) {
+                                    currentUserId =
+                                        userSnapshot.data.toString();
+                                    if (userSnapshot.data.toString() ==
+                                        snapshot.data["data"][0]["gigs_details"]
+                                            ["user_id"]) {
+                                      return FlatButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            CupertinoPageRoute(
+                                              builder: (context) =>
+                                                  EditCameoScreen(
+                                                cameoDetail:
+                                                    snapshot.data["data"][0]
+                                                        ["gigs_details"],
+                                                videos: snapshot.data["data"][0]
+                                                    ["video_path"],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          'Edit Cameo',
+                                          style: kAuthTitleStyle.copyWith(
+                                              color: Colors.white,
+                                              fontSize: 24),
+                                        ),
+                                        color: Color(0xffff037c),
+                                      );
+                                    } else {
+                                      return FlatButton(
+                                        onPressed: () {
+                                          return showDialog(
+                                            context: context,
+                                            builder: (context) => PaymentPopup(
+                                              price: double.parse(
+                                                  snapshot.data["data"][0]
+                                                          ["gigs_details"]
+                                                      ["gig_price"]),
+                                              paymentTo: int.parse(
+                                                  snapshot.data["data"][0]
+                                                      ["gigs_details"]["id"]),
+                                              paymentFrom: 10,
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          'Request ${snapshot.data["data"][0]["gigs_details"]["currency_sign"]}${snapshot.data["data"][0]["gigs_details"]["gig_price"]}',
+                                          style: kAuthTitleStyle.copyWith(
+                                              color: Colors.white,
+                                              fontSize: 24),
+                                        ),
+                                        color: Color(0xffff037c),
+                                      );
+                                    }
+                                  } else {
+                                    return FlatButton(
+                                      onPressed: () {
+                                        return showDialog(
+                                          context: context,
+                                          builder: (context) => PaymentPopup(
+                                            price: double.parse(snapshot
+                                                    .data["data"][0]
+                                                ["gigs_details"]["gig_price"]),
+                                            paymentTo: int.parse(
+                                                snapshot.data["data"][0]
+                                                    ["gigs_details"]["id"]),
+                                            paymentFrom: 10,
+                                          ),
+                                        );
+                                      },
+                                      child: CircularProgressIndicator(
+                                        valueColor: AlwaysStoppedAnimation(
+                                            Colors.white),
+                                      ),
+                                      color: Color(0xffff037c),
+                                    );
+                                  }
+                                }),
+                          ),
+                        ),
+                        FutureBuilder(
+                          future: UserSession().getCurrentUserId(),
+                          builder: (context, userSnapshot) {
+                            if (userSnapshot.hasData) {
+                              if (userSnapshot.data !=
+                                  snapshot.data["data"][0]["gigs_details"]
+                                      ["user_id"]) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 18.0, vertical: 10),
+                                  child: Container(
+                                      width: double.infinity,
+                                      height: 60,
+                                      clipBehavior: Clip.hardEdge,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(100)),
+                                      child: FlatButton(
+                                        onPressed: () async {
+                                          Navigator.push(
+                                            context,
+                                            CupertinoPageRoute(
+                                              builder: (context) => ChatScreen(
+                                                userId: int.parse(
+                                                    snapshot.data["data"][0]
+                                                            ["gigs_details"]
+                                                        ["user_id"]),
+                                                username: snapshot.data["data"]
+                                                        [0]["gigs_details"]
+                                                    ["title"],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          'Chat ',
+                                          style: kAuthTitleStyle.copyWith(
+                                              color: Colors.white,
+                                              fontSize: 24),
+                                        ),
+                                        color: Color(0xffff037c),
+                                      )),
                                 );
-                              },
-                              child: Text(
-                                'Request ${snapshot.data["data"][0]["gigs_details"]["currency_sign"]}${snapshot.data["data"][0]["gigs_details"]["gig_price"]}',
-                                style: kAuthTitleStyle.copyWith(
-                                    color: Colors.white, fontSize: 24),
-                              ),
-                              color: Color(0xffff037c),
-                            ),
+                              } else {
+                                return height(0.0);
+                              }
+                            } else {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                          },
+                        ),
+                        height(30.0),
+                        Text(
+                          "LATEST CAMEOS",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: kSecondaryColor,
+                            fontSize: 25,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18.0, vertical: 10),
-                          child: Container(
-                            width: double.infinity,
-                            height: 60,
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(100)),
-                            child: FlatButton(
-                              onPressed: () => Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => ChatScreen(
-                                    userId: int.parse(snapshot.data["data"][0]
-                                        ["gigs_details"]["user_id"]),
-                                    username: snapshot.data["data"][0]
-                                        ["gigs_details"]["title"],
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10.0),
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset('assets/images/youtube.svg'),
+                                  width(10.0),
+                                  Text(
+                                    "Youtube",
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
                                   ),
-                                ),
+                                ],
                               ),
-                              child: Text(
-                                'Chat ',
-                                style: kAuthTitleStyle.copyWith(
-                                    color: Colors.white, fontSize: 24),
-                              ),
-                              color: Color(0xffff037c),
                             ),
-                          ),
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Container(
+                                child: YoutubePlayer(
+                                    controller: _controller,
+                                    showVideoProgressIndicator: true,
+                                    progressColors: ProgressBarColors(
+                                      playedColor: kSecondaryColor,
+                                      handleColor: kSecondaryColor,
+                                    )),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10.0),
+                              child: Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/images/vimeo.svg',
+                                    width: 40,
+                                  ),
+                                  width(10.0),
+                                  Text(
+                                    "Vimeo",
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                                child: VimeoPlayer(
+                                    id: '395212534', autoPlay: false)),
+                          ],
                         ),
+
+                        // Container(
+                        //   height: 250,
+                        //   child: GridView.builder(
+                        //       itemCount:
+                        //           snapshot.data["data"][0]["video_path"].length,
+                        //       gridDelegate:
+                        //           SliverGridDelegateWithFixedCrossAxisCount(
+                        //               crossAxisCount: 1),
+                        //       itemBuilder: (context, index) {
+                        //         return GridTile(
+                        //           child: NativeVideoView(
+                        //             keepAspectRatio: true,
+                        //             showMediaController: true,
+                        //             onCreated: (controller) {
+                        //               controller.setVideoSource(
+                        //                 'https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
+                        //                 sourceType: VideoSourceType.network,
+                        //               );
+                        //             },
+                        //             onPrepared: (controller, info) {
+                        //               controller.play();
+                        //             },
+                        //             onError:
+                        //                 (controller, what, extra, message) {
+                        //               print(
+                        //                   'Player Error ($what | $extra | $message)');
+                        //             },
+                        //             onCompletion: (controller) {
+                        //               print('Video completed');
+                        //             },
+                        //             onProgress: (progress, duration) {
+                        //               print('$progress | $duration');
+                        //             },
+                        //           ),
+                        //         );
+                        //       }),
+                        // ),
                       ],
                     ),
                   );
-                else {
+                } else {
                   return Center(
                     child: ListTile(
                       leading: Icon(
@@ -229,10 +436,19 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                     ),
                   );
                 else
+                  // return CameoDetailShimmer();
                   return Center(child: CircularProgressIndicator());
               }),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _videController.dispose();
+    _controller.dispose();
+    super.dispose();
   }
 }

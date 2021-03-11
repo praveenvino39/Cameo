@@ -1,11 +1,16 @@
 import 'dart:io';
-
 import 'package:cameo/Screens/CameoDetailScreen.dart';
 import 'package:cameo/Screens/ChatScreen.dart';
 import 'package:cameo/Screens/MainScreen.dart';
+import 'package:cameo/Screens/MessageScreen.dart';
+import 'package:cameo/Screens/NotificationScreen.dart';
 import 'package:cameo/Screens/SignupScreen.dart';
+import 'package:cameo/constants.dart';
+import 'package:cameo/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'Screens/LoginScreen.dart';
 import 'Screens/WelcomeScreen.dart';
 
@@ -37,19 +42,26 @@ class MainActivity extends StatefulWidget {
 class _MainActivityState extends State<MainActivity> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme:
-          ThemeData(primaryColor: Color(0xff101010), accentColor: Colors.white),
-      debugShowCheckedModeBanner: false,
-      routes: {
-        '/': widget.initialWidget,
-        '/login': (context) => LoginScreen(),
-        '/signup': (context) => SignupScreen(),
-        '/home': (context) => MainScreen(),
-        '/detail': (context) => CameoDetailScreen(),
-        '/chat': (context) => ChatScreen(),
-        // '/profile': (context) => EditUserProfileScreen(),
-      },
+    return ChangeNotifierProvider(
+      create: (context) => UserProvider(),
+      child: GetMaterialApp(
+          theme: ThemeData(
+              primaryColor: Color(0xff101010),
+              accentColor: Colors.white,
+              unselectedWidgetColor: kSecondaryColor,
+              primarySwatch: Colors.pink),
+          debugShowCheckedModeBanner: false,
+          routes: {
+            '/': widget.initialWidget,
+            '/welcome': (context) => WelcomeScreen(),
+            '/login': (context) => LoginScreen(),
+            '/signup': (context) => SignupScreen(),
+            '/home': (context) => MainScreen(),
+            '/detail': (context) => CameoDetailScreen(),
+            '/chat': (context) => ChatScreen(),
+            '/notification': (context) => NotificationScreen(),
+            '/messages': (context) => MessagesScreen()
+          }),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cameo/Screens/CameoDetailScreen.dart';
 import 'package:cameo/constants.dart';
 import 'package:cameo/utils.dart';
@@ -17,7 +18,8 @@ class CustomCard extends StatefulWidget {
       {Key key, String name, String position, String url, var price, var id}) {
     this.name = name;
     dom.Document document = parse(position);
-    this.position = document.getElementsByTagName('strong')[0].innerHtml;
+    // this.position = document.getElementsByTagName('strong')[0].innerHtml;
+    this.position = position;
     this.url = url;
     this.price = double.parse(price);
     this.id = int.parse(id);
@@ -34,7 +36,6 @@ class _CustomCardState extends State<CustomCard> {
       child: InkWell(
         child: GestureDetector(
           onTap: () => {
-            print(widget.id.toString()),
             Navigator.push(
                 context,
                 CupertinoPageRoute(
@@ -61,12 +62,18 @@ class _CustomCardState extends State<CustomCard> {
                         clipBehavior: Clip.hardEdge,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10)),
-                        child: FadeInImage.memoryNetwork(
-                          fadeInDuration: Duration(milliseconds: 200),
-                          placeholder: kTransparentImage,
+                        child: CachedNetworkImage(
                           height: 200,
-                          image: widget.url,
+                          width: 200,
                           fit: BoxFit.cover,
+                          imageUrl: widget.url,
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) => Center(
+                            child: CircularProgressIndicator(
+                                value: downloadProgress.progress),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
                         ),
                       ),
                     ),
@@ -84,12 +91,15 @@ class _CustomCardState extends State<CustomCard> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.name, style: kCardName),
+                    Text(titleCase(string: widget.name), style: kCardName),
                     height(6.0),
-                    Text(
-                      widget.position,
-                      style: kSubText,
-                      overflow: TextOverflow.ellipsis,
+                    Container(
+                      height: 30,
+                      child: Text(
+                        parseHtml2String(string: widget.position),
+                        style: kSubText,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     )
                   ],
                 )
@@ -100,4 +110,11 @@ class _CustomCardState extends State<CustomCard> {
       ),
     );
   }
+}
+
+String parseHtml2String({String string}) {
+  final document = parse(string);
+  final String parsedString = parse(document.body.text).documentElement.text;
+
+  return parsedString;
 }

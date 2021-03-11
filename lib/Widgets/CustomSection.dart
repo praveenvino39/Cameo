@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 import 'CustomCard.dart';
 
+// ignore: must_be_immutable
 class CustomSection extends StatefulWidget {
   CustomSection({Key key, String title, var cardItems}) {
     this.title = title;

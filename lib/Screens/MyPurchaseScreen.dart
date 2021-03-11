@@ -1,4 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cameo/Network/networkHelper.dart';
 import 'package:cameo/Widgets/FilterDropDown.dart';
+import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
 import 'package:cameo/constants.dart';
 import 'package:cameo/utils.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
@@ -14,6 +17,7 @@ class MyPurchaseScreen extends StatefulWidget {
 class _MyPurchaseScreenState extends State<MyPurchaseScreen> {
   List<DateTime> dateRange;
   String from, to;
+  bool isFinished = false;
   List<String> dropDownItems = [
     'New',
     'Pending',
@@ -108,20 +112,358 @@ class _MyPurchaseScreenState extends State<MyPurchaseScreen> {
               ),
               Expanded(
                 child: Container(
-                  child: ListView.builder(
-                      itemBuilder: (context, index) => ListTile(
-                          tileColor: Colors.white,
-                          title: Text("New Purchase"),
-                          leading: Icon(Icons.monetization_on),
-                          trailing: Text("\$70"),
-                          onTap: () => showModalBottomSheet(
+                  child: FutureBuilder(
+                    future: ApiHelper().activities(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return ListView.builder(
+                          itemCount: snapshot.data["my_purchases"].length,
+                          itemBuilder: (context, index) => ListTile(
+                            tileColor: Colors.white,
+                            title: Text(
+                                snapshot.data["my_purchases"][index]["title"]),
+                            leading: Text(snapshot.data["my_purchases"][index]
+                                ["order_id"]),
+                            trailing: Text(
+                                "${snapshot.data["my_purchases"][index]['currency_sign']}${snapshot.data["my_purchases"][index]['amount']}"),
+                            onTap: () => showModalBottomSheet(
                               context: context,
-                              builder: (context) => BottomSheet(
+                              builder: (context) {
+                                return StatefulBuilder(
+                                  builder: (context, newSetState) =>
+                                      BottomSheet(
                                     onClosing: () => Navigator.pop(context),
-                                    builder: (context) => Center(
-                                      child: Text("New Sales"),
-                                    ),
-                                  )))),
+                                    builder: (context) {
+                                      String dropDownValue;
+                                      var value = snapshot.data["my_purchases"]
+                                          [index]["seller_status"];
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 25,
+                                                backgroundImage:
+                                                    CachedNetworkImageProvider(
+                                                        'https://cameo.deliveryventure.com/${snapshot.data["my_purchases"][index]["gig_image_thumb"]}'),
+                                              ),
+                                              height(12.0),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        '#${snapshot.data["my_purchases"][index]["order_id"]}',
+                                                        style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                      height(5.0),
+                                                      Text(snapshot.data[
+                                                                  "my_purchases"]
+                                                              [index]
+                                                          ["created_date"])
+                                                    ],
+                                                  ),
+                                                  if (value == "1")
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        color: Colors.blue,
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 4),
+                                                      child: Text(
+                                                        "New",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    )
+                                                  else if (value == "2")
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        color: Colors
+                                                            .yellow.shade800,
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 4),
+                                                      child: Text(
+                                                        "Pending",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    )
+                                                  else if (value == "3")
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        color:
+                                                            Colors.blueAccent,
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 4),
+                                                      child: Text(
+                                                        "Processing",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    )
+                                                  else if (value == "7" &&
+                                                      !isFinished)
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        color: Colors.green,
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 4),
+                                                      child: Text(
+                                                        "Completed Request",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    )
+                                                  else if (isFinished ||
+                                                      value == "6")
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        color: Colors.green,
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 4),
+                                                      child: Text(
+                                                        "Completed",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    )
+                                                  else if (value == "5")
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        color: Colors.red,
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 4),
+                                                      child: Text(
+                                                        "Declined",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    )
+                                                  else if (snapshot.data[
+                                                              "my_sale"][index]
+                                                          ["seller_status"] ==
+                                                      "7")
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                        color: Colors.green,
+                                                      ),
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 10,
+                                                              vertical: 4),
+                                                      child: Text(
+                                                        "Completed",
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                    )
+                                                ],
+                                              ),
+                                              height(12.0),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text("Payment Method",
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          color: Colors
+                                                              .grey.shade800,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  Text(
+                                                      snapshot.data[
+                                                              "my_purchases"]
+                                                          [index]["source"],
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                ],
+                                              ),
+                                              height(12.0),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text("Product Name",
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          color: Colors
+                                                              .grey.shade800,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  Text(
+                                                      snapshot.data[
+                                                              "my_purchases"]
+                                                          [index]["title"],
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                ],
+                                              ),
+                                              height(12.0),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text("Grand Total",
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          color: Colors
+                                                              .grey.shade800,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  Text(
+                                                      '${snapshot.data["my_purchases"][index]["currency_sign"]}${snapshot.data["my_purchases"][index]["amount"]}',
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold)),
+                                                  value == '7'
+                                                      ? DropdownButton(
+                                                          onChanged: value ==
+                                                                  "6"
+                                                              ? null
+                                                              : (val) async {
+                                                                  loading(
+                                                                      context);
+                                                                  Map res = await ApiHelper().changeOrderStatusBuyer(
+                                                                      orderId: snapshot.data["my_purchases"]
+                                                                              [
+                                                                              index]
+                                                                          [
+                                                                          "order_id"],
+                                                                      orderStatus:
+                                                                          val);
+
+                                                                  if (res !=
+                                                                      null) {
+                                                                    newSetState(
+                                                                        () {
+                                                                      isFinished =
+                                                                          true;
+                                                                      snapshot.data["my_purchases"]
+                                                                              [
+                                                                              index]
+                                                                          [
+                                                                          "order_id"] = val;
+                                                                      value =
+                                                                          val;
+                                                                    });
+                                                                    setState(
+                                                                        () {
+                                                                      snapshot.data["my_purchases"]
+                                                                              [
+                                                                              index]
+                                                                          [
+                                                                          "seller_status"] = "6";
+                                                                    });
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  }
+                                                                },
+                                                          hint: Text("Status"),
+                                                          value: dropDownValue,
+                                                          items: [
+                                                              DropdownMenuItem(
+                                                                onTap: () => {
+                                                                  print(value)
+                                                                },
+                                                                child: Text(
+                                                                    "Completed"),
+                                                                value: "6",
+                                                              ),
+                                                              DropdownMenuItem(
+                                                                child: Text(
+                                                                    "Rejected"),
+                                                                value: "8",
+                                                              ),
+                                                            ])
+                                                      : height(10.0),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return Text("Something went wrong");
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    },
+                  ),
                 ),
               )
             ],

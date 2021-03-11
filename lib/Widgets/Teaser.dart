@@ -16,9 +16,13 @@ class Teaser extends StatelessWidget {
           color: Colors.red, borderRadius: BorderRadius.circular(10)),
       margin: EdgeInsets.symmetric(vertical: 20),
       child: Stack(children: [
-        Image(
-          image: AssetImage('assets/images/teaser.gif'),
-          fit: BoxFit.cover,
+        Container(
+          height: 238,
+          child: Image(
+            image: AssetImage('assets/images/teaser.gif'),
+            // image: NetworkImage("https://i.pinimg.com/originals/d4/88/af/d488af4a43f82514e2a3acb5e3db8257.png"),
+            fit: BoxFit.cover,
+          ),
         ),
         Center(
           child: Text(

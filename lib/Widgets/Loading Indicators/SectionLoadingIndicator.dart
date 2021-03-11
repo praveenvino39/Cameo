@@ -1,4 +1,3 @@
-import 'package:cameo/utils.dart';
 import 'package:flutter/material.dart';
 
 class SectionLoadingIndicator extends StatelessWidget {

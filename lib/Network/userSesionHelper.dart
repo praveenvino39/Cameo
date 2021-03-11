@@ -3,8 +3,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class UserSession {
   FlutterSecureStorage _storage = FlutterSecureStorage();
-  void presistUser({String token}) async {
+  void presistUser({String token, String username}) async {
     await _storage.write(key: "user_id", value: token);
+    await _storage.write(key: "username", value: username);
   }
 
   Future<String> getCurrentUserId() async {

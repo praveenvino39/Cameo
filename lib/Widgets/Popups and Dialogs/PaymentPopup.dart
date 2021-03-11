@@ -20,7 +20,7 @@ class PaymentPopup extends StatelessWidget {
         child: AlertDialog(
       backgroundColor: Colors.white,
       content: Container(
-        height: 140,
+        height: 190,
         child: Column(
           children: [
             Text(
@@ -39,6 +39,26 @@ class PaymentPopup extends StatelessWidget {
               svgSize: 20,
               title: 'Stripe',
             ),
+            Container(
+              width: 190,
+              child: OutlineButton(
+                onPressed: () => {},
+                highlightColor: Colors.transparent,
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image(
+                      width: 20,
+                      image: AssetImage('assets/images/paytabs.png'),
+                    ),
+                    width(4.0),
+                    Text("Paytabs")
+                  ],
+                ),
+              ),
+            )
           ],
         ),
       ),

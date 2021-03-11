@@ -22,8 +22,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     width: MediaQuery.of(context).size.width,
                     height: 650,
                     child: Image(
-                      image: NetworkImage(
-                          'https://images.unsplash.com/photo-1607081692245-419edffb5462?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=334&q=80'),
+                      image: AssetImage('assets/images/welcome1.jpeg'),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -31,8 +30,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     padding: const EdgeInsets.only(top: 300, left: 220),
                     child: Container(
                       child: Image(
-                        image: NetworkImage(
-                            'https://images.unsplash.com/photo-1595986630530-969786b19b4d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=375&q=80'),
+                        image: AssetImage('assets/images/welcome2.jpeg'),
                       ),
                       clipBehavior: Clip.hardEdge,
                       width: 150,

@@ -1,6 +1,9 @@
+import 'package:cameo/Screens/NotificationScreen.dart';
 import 'package:cameo/constants.dart';
 import 'package:cameo/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:getwidget/getwidget.dart';
 
 // ignore: must_be_immutable
 class CustomAppBar extends StatefulWidget {
@@ -18,6 +21,51 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 20),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.white,
+            child: Stack(
+              children: [
+                Center(
+                  child: IconButton(
+                      splashRadius: 22,
+                      icon: Icon(Icons.notifications),
+                      onPressed: () => Get.to(() => NotificationScreen())
+                      // Navigator.pushNamed(context, '/notification'),
+                      ),
+                ),
+                Positioned(
+                  child: Container(
+                    padding: EdgeInsets.all(3.5),
+                    decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(1000)),
+                    child: Text(
+                      "12",
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 20),
+          child: CircleAvatar(
+            radius: 20,
+            backgroundColor: Colors.white,
+            child: Center(
+              child: IconButton(
+                splashRadius: 22,
+                icon: Icon(Icons.message),
+                onPressed: () => Navigator.pushNamed(context, '/messages'),
+              ),
+            ),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.only(right: 20),
           child: CircleAvatar(

@@ -1,13 +1,17 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cameo/Screens/BuyScreen.dart';
 import 'package:cameo/Screens/MyCameoScreen.dart';
 import 'package:cameo/Screens/EditUserProfileScreen.dart';
+import 'package:cameo/Screens/MyFileScreen.dart';
 import 'package:cameo/Screens/MyPaymentScreen.dart';
 import 'package:cameo/Screens/MyPurchaseScreen.dart';
 import 'package:cameo/Screens/SaleScreen.dart';
-import 'package:cameo/utils.dart';
+import 'package:cameo/Screens/SellScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../constants.dart';
 
@@ -42,8 +46,10 @@ class CustomDrawer extends StatelessWidget {
               currentAccountPicture: GFAvatar(
                 radius: 80.0,
                 backgroundColor: Colors.white,
-                backgroundImage: NetworkImage(
-                    'https://d31wcbk3iidrjq.cloudfront.net/UFtPf1TjL_avatar-5N0uIMgaL.jpg?h=332&w=332&q=100'),
+                backgroundImage: CachedNetworkImageProvider(
+                    "https://d31wcbk3iidrjq.cloudfront.net/UFtPf1TjL_avatar-5N0uIMgaL.jpg?h=332&w=332&q=100"),
+                // backgroundImage: NetworkImage(
+                //     'https://d31wcbk3iidrjq.cloudfront.net/UFtPf1TjL_avatar-5N0uIMgaL.jpg?h=332&w=332&q=100'),
               ),
               decoration: BoxDecoration(
                   color: Color(0xff101010),
@@ -53,10 +59,35 @@ class CustomDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    "Username",
-                    style: kCardName,
-                  ),
+                  FutureBuilder(
+                      future: FlutterSecureStorage().read(key: "username"),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return Text(
+                            snapshot.data,
+                            style: kCardName,
+                          );
+                        } else {
+                          return Shimmer.fromColors(
+                              period: Duration(milliseconds: 500),
+                              baseColor: Colors.grey[300],
+                              highlightColor: Colors.white,
+                              enabled: true,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  color: Colors.green,
+                                  width: 100,
+                                  // child: Text(
+                                  //   "Username",
+                                  //   style: kCardName,
+                                  // ),
+
+                                  height: 20,
+                                ),
+                              ));
+                        }
+                      }),
                 ],
               ),
             ),
@@ -71,6 +102,14 @@ class CustomDrawer extends StatelessWidget {
               onTap: () => {
                 Navigator.push(context,
                     CupertinoPageRoute(builder: (context) => MyCameoScreen()))
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.file_copy),
+              title: Text('Files'),
+              onTap: () => {
+                Navigator.push(context,
+                    CupertinoPageRoute(builder: (context) => FileScreen()))
               },
             ),
             ListTile(
@@ -99,21 +138,36 @@ class CustomDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
+              leading: Icon(Icons.monetization_on),
+              title: Text('Sell'),
+              onTap: () => {
+                Navigator.push(context,
+                    CupertinoPageRoute(builder: (context) => SellScreen())),
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.shopping_bag),
+              title: Text('Buy'),
+              onTap: () => {
+                Navigator.push(context,
+                    CupertinoPageRoute(builder: (context) => BuyScreen())),
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.person),
               title: Text('Profile'),
               onTap: () => {
-                Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                        builder: (context) => EditUserProfileScreen())),
+                Navigator.of(context).push(CupertinoPageRoute(
+                    builder: (context) => EditUserProfileScreen())),
               },
             ),
             ListTile(
               leading: Icon(Icons.settings),
               title: Text('Logout'),
               onTap: () async => {
-                Navigator.popAndPushNamed(context, '/login'),
-                await storage.delete(key: "user_id")
+                await storage.delete(key: "user_id"),
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/welcome', (route) => false),
               },
             ),
           ],

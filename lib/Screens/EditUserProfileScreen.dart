@@ -11,7 +11,11 @@ class EditUserProfileScreen extends StatefulWidget {
   _EditUserProfileScreenState createState() => _EditUserProfileScreenState();
 }
 
-class _EditUserProfileScreenState extends State<EditUserProfileScreen> {
+class _EditUserProfileScreenState extends State<EditUserProfileScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   //Focus Node
   FocusNode fnName = FocusNode();
 
@@ -45,6 +49,7 @@ class _EditUserProfileScreenState extends State<EditUserProfileScreen> {
       child: DefaultTabController(
         length: 3,
         child: Scaffold(
+          key: scaffoldKey,
           backgroundColor: kBodyBackgroundColor,
           appBar: AppBar(
             elevation: 2,
@@ -64,9 +69,15 @@ class _EditUserProfileScreenState extends State<EditUserProfileScreen> {
             ),
           ),
           body: TabBarView(children: [
-            GeneralDetailTab(),
-            PasswordUpdateTab(),
-            PaymentUpdateTab()
+            GeneralDetailTab(
+              scaffoldKey: scaffoldKey,
+            ),
+            PasswordUpdateTab(
+              scaffoldKey: scaffoldKey,
+            ),
+            PaymentUpdateTab(
+              scaffoldKey: scaffoldKey,
+            )
           ]),
         ),
       ),

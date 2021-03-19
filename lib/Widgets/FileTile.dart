@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-
+import 'package:cameo/Network/networkHelper.dart';
 import '../constants.dart';
 
 // ignore: must_be_immutable
@@ -71,7 +71,7 @@ class _FileTileState extends State<FileTile>
                         }
                         try {
                           Response response = await dioInstance.download(
-                              "http://cameo.deliveryventure.com/uploads/digital/${widget.fileName}",
+                              "$domainUrl/uploads/digital/${widget.fileName}",
                               "$downloadPath${widget.fileName}",
                               // Listen the download progress.
 

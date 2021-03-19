@@ -1,7 +1,10 @@
 // ignore: unused_import
+import 'package:cameo/Screens/ViewVideoScreen.dart';
 import 'package:cameo/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
+import 'package:cameo/Network/networkHelper.dart';
 
 class VideoExample extends StatefulWidget {
   final String videoUrl;
@@ -28,7 +31,9 @@ class VideoState extends State<VideoExample> {
     if (playerController == null) {
       print(widget.videoUrl);
       playerController = VideoPlayerController.network(
-          "https://cameo.deliveryventure.com/${widget.videoUrl}")
+          "$domainUrl/${widget.videoUrl}")
+        // VideoPlayerController.network(
+        //     "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4")
         ..addListener(listener)
         ..initialize()
         ..pause()
@@ -59,8 +64,11 @@ class VideoState extends State<VideoExample> {
             children: [
               Container(
                 child: playerController != null
-                    ? VideoPlayer(
-                        playerController,
+                    ? Hero(
+                        tag: widget.videoUrl,
+                        child: VideoPlayer(
+                          playerController,
+                        ),
                       )
                     : Container(
                         width: 10,
@@ -71,25 +79,27 @@ class VideoState extends State<VideoExample> {
                 child: IconButton(
                   icon: isPlaying ? Icon(Icons.pause) : Icon(Icons.play_arrow),
                   onPressed: () async {
-                    if (playerController.value.isPlaying) {
-                      setState(() {
-                        playerController.pause();
-                        isPlaying = false;
-                      });
-                    } else {
-                      if (playerController.value.position ==
-                          playerController.value.duration) {
-                        await playerController.seekTo(Duration.zero);
-                        setState(() {
-                          playerController.play();
+                    Get.to(() => ViewVideoScreen(),
+                        arguments: {"video_url": widget.videoUrl});
+                    // if (playerController.value.isPlaying) {
+                    //   setState(() {
+                    //     playerController.pause();
+                    //     isPlaying = false;
+                    //   });
+                    // } else {
+                    //   if (playerController.value.position ==
+                    //       playerController.value.duration) {
+                    //     await playerController.seekTo(Duration.zero);
+                    //     setState(() {
+                    //       playerController.play();
 
-                          isPlaying = true;
-                        });
-                      } else {
-                        playerController.play();
-                        isPlaying = true;
-                      }
-                    }
+                    //       isPlaying = true;
+                    //     });
+                    //   } else {
+                    //     playerController.play();
+                    //     isPlaying = true;
+                    //   }
+                    // }
                   },
                   color: Colors.white,
                 ),

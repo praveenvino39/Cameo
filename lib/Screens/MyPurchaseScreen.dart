@@ -148,7 +148,7 @@ class _MyPurchaseScreenState extends State<MyPurchaseScreen> {
                                                 radius: 25,
                                                 backgroundImage:
                                                     CachedNetworkImageProvider(
-                                                        'https://cameo.deliveryventure.com/${snapshot.data["my_purchases"][index]["gig_image_thumb"]}'),
+                                                        '$domainUrl/${snapshot.data["my_purchases"][index]["gig_image_thumb"]}'),
                                               ),
                                               height(12.0),
                                               Row(

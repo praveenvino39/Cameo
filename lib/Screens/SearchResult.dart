@@ -58,7 +58,7 @@ class _SearchResultState extends State<SearchResult> {
                               height: 200,
                               fit: BoxFit.cover,
                               imageUrl:
-                                  'https://cameo.deliveryventure.com/${snapshot.data[index]["gig_image"]}',
+                                  '$domainUrl/${snapshot.data[index]["gig_image"]}',
                               progressIndicatorBuilder:
                                   (context, url, downloadProgress) => Center(
                                 child: CircularProgressIndicator(

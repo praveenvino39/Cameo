@@ -8,7 +8,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
-const baseUrl = 'https://cameo.deliveryventure.com/api';
+// http://ec2-54-189-124-142.us-west-2.compute.amazonaws.com/
+const baseUrl = 'http://ec2-54-189-124-142.us-west-2.compute.amazonaws.com/api';
+const domainUrl = 'http://ec2-54-189-124-142.us-west-2.compute.amazonaws.com';
 
 const endPoints = {
   //authentication and authorization
@@ -271,10 +273,9 @@ class ApiHelper {
   Future<List> getFiles({String getby}) async {
     // print(getby);
     var userId = await FlutterSecureStorage().read(key: "user_id");
-    http.Response response = await http.get(
-        'https://cameo.deliveryventure.com/api/gigs/my_files/$userId?send=$getby');
-    print(
-        'https://cameo.deliveryventure.com/api/gigs/my_files/$userId?send=$getby');
+    http.Response response =
+        await http.get('$baseUrl/gigs/my_files/$userId?send=$getby');
+    print('$baseUrl/gigs/my_files/$userId?send=$getby');
     Map data = jsonDecode(response.body);
     return data["data"];
   }
@@ -371,7 +372,6 @@ class ApiHelper {
   }
 
   Future<Map> sendMessage({receiverId, message}) async {
-    // https://cameo.deliveryventure.com/api/gigs/buyer_chat
     var senderId = await FlutterSecureStorage().read(key: "user_id");
     http.Response response = await http.post("$baseUrl/gigs/buyer_chat", body: {
       "sell_gigs_userid": receiverId.toString(),
@@ -493,10 +493,12 @@ class ApiHelper {
     //  /gigs/update_video/86?video=uploads/gigs_videos/1614349951SampleVideo_1280x720_1mb.mp4
   }
 
-  Future<Map> uploadVideo({PickedFile vid, String gigId}) async {
-    var videoArray = vid.path;
-    int splitIndex = vid.path.lastIndexOf('/');
+  Future<Map> uploadVideo({FilePickerResult vid, String gigId}) async {
+    var videoArray = vid.files.first.path;
+    int splitIndex = vid.files.first.path.lastIndexOf('/');
     videoArray = videoArray.substring(splitIndex + 1);
+    print(vid.files.first.path);
+    print(videoArray);
     http.MultipartRequest request = http.MultipartRequest(
       'POST',
       Uri.parse("$baseUrl${endPoints["upload_video"]}"),
@@ -504,15 +506,13 @@ class ApiHelper {
     Map<String, String> headers = {"Content-type": "multipart/form-data"};
     if (vid != null) {
       request.files.add(
-        await http.MultipartFile.fromPath("gig_video", vid.path),
+        await http.MultipartFile.fromPath("gig_video", vid.files.first.path),
       );
     }
 
     request.headers.addAll(headers);
     request.fields.addAll({"video_array": videoArray, "update_gig_id": gigId});
     var res = await request.send();
-    print(videoArray);
-    print(vid.path);
     var data = await res.stream.bytesToString();
     // Map convertedData = jsonDecode(data);
     print(data);

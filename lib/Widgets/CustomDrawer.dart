@@ -4,9 +4,11 @@ import 'package:cameo/Screens/MyCameoScreen.dart';
 import 'package:cameo/Screens/EditUserProfileScreen.dart';
 import 'package:cameo/Screens/MyFileScreen.dart';
 import 'package:cameo/Screens/MyPaymentScreen.dart';
+import 'package:cameo/Network/oauth_helper.dart';
 import 'package:cameo/Screens/MyPurchaseScreen.dart';
 import 'package:cameo/Screens/SaleScreen.dart';
 import 'package:cameo/Screens/SellScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -164,10 +166,15 @@ class CustomDrawer extends StatelessWidget {
             ListTile(
               leading: Icon(Icons.settings),
               title: Text('Logout'),
-              onTap: () async => {
-                await storage.delete(key: "user_id"),
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/welcome', (route) => false),
+              onTap: () async {
+                try {
+                  await storage.delete(key: "user_id");
+                  OauthHelper().signOutGoogle();
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, '/welcome', (route) => false);
+                } catch (e) {
+                  throw e.toString();
+                }
               },
             ),
           ],

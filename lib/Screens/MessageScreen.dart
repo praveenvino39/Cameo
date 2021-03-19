@@ -1,6 +1,7 @@
 import 'package:cameo/Network/networkHelper.dart';
 import 'package:cameo/Screens/ChatScreen.dart';
 import 'package:cameo/constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class MessagesScreen extends StatelessWidget {
@@ -47,9 +48,9 @@ class MessagesScreen extends StatelessWidget {
                     return Center(child: Text("Something went wrong"));
                   } else {
                     return Center(
-                        child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation(kSecondaryColor)));
+                      child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(kSecondaryColor)),
+                    );
                   }
                 }),
           ),

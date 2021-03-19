@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cameo/Network/oauth_helper.dart';
 import 'package:cameo/Network/userSesionHelper.dart';
 import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
 import 'package:cameo/providers/user_provider.dart';
@@ -6,10 +7,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:cameo/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:cameo/constants.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:cameo/Network/networkHelper.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -29,7 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
   FocusNode fnPassword = FocusNode();
   @override
   Widget build(BuildContext context) {
-    var userProvider = Provider.of<UserProvider>(context);
     return SafeArea(
       child: Scaffold(
         body: Container(
@@ -78,19 +79,66 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                FlatButton(
-                  onPressed: () =>
-                      validateAndLogin(email, password, userProvider),
-                  child: Text(
-                    'Login',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.white),
+                Container(
+                  width: 200,
+                  child: FlatButton(
+                    onPressed: () => validateAndLogin(email, password),
+                    child: Text(
+                      'Login',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.white),
+                    ),
+                    color: Colors.yellow.shade800,
                   ),
-                  color: Colors.yellow.shade800,
                 ),
+                Container(
+                  width: 200,
+                  child: OutlineButton(
+                    highlightedBorderColor: Colors.yellow.shade800,
+                    borderSide: BorderSide(color: Colors.yellow.shade800),
+                    onPressed: () async {
+                      loading(context);
+                      var result = await OauthHelper().signInGoogle();
+                      if (result) {
+                        Get.back();
+                      } else {
+                        Get.back();
+                      }
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/images/google.svg',
+                          width: 30,
+                        ),
+                        width(10.0),
+                        Text(
+                          'Login with google',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w300,
+                              color: Colors.black),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // FlatButton(
+                //   onPressed: () => OauthHelper().signOutGoogle(),
+                //   child: Text(
+                //     'Logout',
+                //     style: TextStyle(
+                //         fontSize: 20,
+                //         fontWeight: FontWeight.w300,
+                //         color: Colors.white),
+                //   ),
+                //   color: Colors.yellow.shade800,
+                // ),
                 height(20.0),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -117,8 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  validateAndLogin(
-      String email, String password, UserProvider userProvider) async {
+  validateAndLogin(String email, String password) async {
     bool isValid = _formKey.currentState.validate();
     if (isValid) {
       loading(context);

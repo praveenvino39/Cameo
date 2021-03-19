@@ -330,8 +330,7 @@ class _EditCameoScreenState extends State<EditCameoScreen> {
                         ? Stack(children: [
                             !imageSelected
                                 ? CachedNetworkImage(
-                                    imageUrl:
-                                        'https://cameo.deliveryventure.com/$image',
+                                    imageUrl: '$domainUrl/$image',
                                   )
                                 : Image(
                                     height: 100,
@@ -619,6 +618,6 @@ Future<bool> pickImage({context, GlobalKey<ScaffoldState> scaffoldKey}) async {
   }
 }
 
-void pickVideo({GlobalKey<ScaffoldState> scaffoldKey}) async {
-  pckvid = await ImagePicker().getVideo(source: ImageSource.gallery);
-}
+// void pickVideo({GlobalKey<ScaffoldState> scaffoldKey}) async {
+//   pckvid = await ImagePicker().getVideo(source: ImageSource.gallery);
+// }

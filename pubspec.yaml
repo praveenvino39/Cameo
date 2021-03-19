@@ -40,6 +40,11 @@ dependencies:
   vimeoplayer: ^0.1.8
   flutter_native_splash: 0.2.9
   get: ^3.26.0
+  video_compress: ^2.1.1
+  firebase_core: 
+  firebase_auth: 
+  google_sign_in:
+  chewie:
 
 dev_dependencies:
   flutter_test:

@@ -22,6 +22,7 @@ class _CameoDetailShimmerState extends State<CameoDetailShimmer> {
         },
         child: SingleChildScrollView(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 30.0, bottom: 20, left: 10),
@@ -34,8 +35,8 @@ class _CameoDetailShimmerState extends State<CameoDetailShimmer> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Shimmer.fromColors(
-                            baseColor: Colors.white,
-                            highlightColor: Colors.grey.shade300,
+                            baseColor: Colors.grey.shade900,
+                            highlightColor: Colors.grey.shade800,
                             period: Duration(milliseconds: 700),
                             child: CircleAvatar(
                               radius: 56,
@@ -52,8 +53,8 @@ class _CameoDetailShimmerState extends State<CameoDetailShimmer> {
                                       MediaQuery.of(context).size.width / 2.2,
                                   child: Shimmer.fromColors(
                                       period: Duration(milliseconds: 700),
-                                      baseColor: Colors.white,
-                                      highlightColor: Colors.grey.shade300,
+                                      baseColor: Colors.grey.shade900,
+                                      highlightColor: Colors.grey.shade800,
                                       child: Container(
                                         width: 200,
                                         height: 30,
@@ -68,8 +69,8 @@ class _CameoDetailShimmerState extends State<CameoDetailShimmer> {
                                 width: MediaQuery.of(context).size.width / 1.8,
                                 child: Shimmer.fromColors(
                                   period: Duration(milliseconds: 700),
-                                  baseColor: Colors.white,
-                                  highlightColor: Colors.grey.shade300,
+                                  baseColor: Colors.grey.shade900,
+                                  highlightColor: Colors.grey.shade800,
                                   child: Container(
                                     width: 200,
                                     height: 30,

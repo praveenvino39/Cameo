@@ -158,7 +158,7 @@ class _SaleScreenState extends State<SaleScreen> {
                                             radius: 25,
                                             backgroundImage:
                                                 CachedNetworkImageProvider(
-                                                    'https://cameo.deliveryventure.com/${snapshot.data["my_sale"][index]["gig_image_thumb"]}'),
+                                                    '$domainUrl/${snapshot.data["my_sale"][index]["gig_image_thumb"]}'),
                                           ),
                                           height(12.0),
                                           Row(

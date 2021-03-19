@@ -72,7 +72,7 @@ class _MyCameoScreenState extends State<MyCameoScreen> {
                                   height: 200,
                                   fit: BoxFit.cover,
                                   imageUrl:
-                                      'https://cameo.deliveryventure.com/${data[index]["image"]}',
+                                      '$domainUrl/${data[index]["image"]}',
                                   progressIndicatorBuilder:
                                       (context, url, downloadProgress) =>
                                           Center(

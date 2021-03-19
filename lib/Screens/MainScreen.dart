@@ -1,13 +1,12 @@
 import 'package:cameo/MockData/data.dart';
 import 'package:cameo/Network/userSesionHelper.dart';
-import 'package:cameo/Screens/SearchResult.dart';
 import 'package:cameo/Widgets/CustomAppBar.dart';
 import 'package:cameo/Widgets/CustomDrawer.dart';
 import 'package:cameo/Widgets/CustomSection.dart';
+import 'SearchResult.dart';
 import 'package:cameo/Widgets/Popups%20and%20Dialogs/SearchAlertDialog.dart';
 import 'package:cameo/Widgets/Teaser.dart';
 import 'package:cameo/constants.dart';
-import 'package:cameo/providers/user_provider.dart';
 import 'package:flutter/src/material/refresh_indicator.dart' as baseRefresh;
 import 'package:cameo/utils.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
@@ -15,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cameo/Network/networkHelper.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -28,6 +28,8 @@ class _MainScreenState extends State<MainScreen>
   bool get wantKeepAlive => false;
   List popularCameo;
   ApiHelper apiHelper = ApiHelper();
+  TextEditingController searchController = TextEditingController();
+  bool showSearch = false;
   List latestCameo;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   FlutterSecureStorage _storage = FlutterSecureStorage();
@@ -59,10 +61,11 @@ class _MainScreenState extends State<MainScreen>
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.pinkAccent,
         onPressed: () async => {
-          showDialog(
-            context: context,
-            builder: (context) => SearchAlertDialog(),
-          )
+          setState(() => showSearch = !showSearch),
+          // showDialog(
+          //   context: context,
+          //   builder: (context) => SearchAlertDialog(),
+          // )
         },
         child: Icon(
           Icons.search,
@@ -73,12 +76,38 @@ class _MainScreenState extends State<MainScreen>
       ),
       drawer: CustomDrawer(),
       key: scaffoldKey,
-      appBar: PreferredSize(
-        preferredSize: kPrefredSize,
-        child: CustomAppBar(
-          scaffoldKey: scaffoldKey,
-        ),
-      ),
+      appBar: !showSearch
+          ? PreferredSize(
+              preferredSize: kPrefredSize,
+              child: CustomAppBar(
+                scaffoldKey: scaffoldKey,
+              ),
+            )
+          : AppBar(
+              title: TextField(
+                controller: searchController,
+                autofocus: true,
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+                keyboardAppearance: Brightness.light,
+                textInputAction: TextInputAction.search,
+                onEditingComplete: () {
+                  Get.to(
+                      () => SearchResult(searchQuery: searchController.text));
+                },
+                decoration: InputDecoration(
+                    hintText: "Search you cameos...",
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.close),
+                      onPressed: () => setState(() => showSearch = !showSearch),
+                      color: kSecondaryColor,
+                      iconSize: 17,
+                      splashRadius: 20,
+                    ),
+                    hintStyle: TextStyle(color: Colors.grey)),
+              ),
+            ),
       backgroundColor: kBodyBackgroundColor,
       body: baseRefresh.RefreshIndicator(
         color: kSecondaryColor,

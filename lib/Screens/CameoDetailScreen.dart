@@ -5,14 +5,12 @@ import 'package:cameo/Screens/ChatScreen.dart';
 import 'package:cameo/Screens/EditCameoScreen.dart';
 import 'package:cameo/Widgets/CameoInfoCardContainer.dart';
 import 'package:cameo/Widgets/Popups%20and%20Dialogs/PaymentPopup.dart';
-import 'package:cameo/Widgets/Shimmers/CameoDetailShimmer.dart';
+
 import 'package:cameo/constants.dart';
 import 'package:cameo/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:video_player/video_player.dart';
 import 'package:vimeoplayer/vimeoplayer.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -28,23 +26,9 @@ class CameoDetailScreen extends StatefulWidget {
 class _CameoDetailScreenState extends State<CameoDetailScreen> {
   final GlobalKey scaffold = GlobalKey<ScaffoldState>();
   final ApiHelper apiHelper = ApiHelper();
-  final String imageBaseUrl = 'https://cameo.deliveryventure.com/';
   UserSession userSession = UserSession();
   String currentUserId;
-  VideoPlayerController _videController;
   YoutubePlayerController _controller;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _videController = VideoPlayerController.network(
-        'https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4')
-      ..initialize().then((_) {
-        // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-        setState(() {});
-      });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +76,7 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                                     CircleAvatar(
                                       radius: 56,
                                       backgroundImage: CachedNetworkImageProvider(
-                                          '$imageBaseUrl${snapshot.data["data"][0]["gigs_details"]["image"]}'),
+                                          '$domainUrl/${snapshot.data["data"][0]["gigs_details"]["image"]}'),
                                     ),
                                     width(20.0),
                                     Column(
@@ -362,48 +346,12 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                               ),
                             ),
                             Container(
-                                child: VimeoPlayer(
-                                    id: '395212534', autoPlay: false)),
+                              height: 300,
+                              child:
+                                  VimeoPlayer(id: '395212534', autoPlay: false),
+                            ),
                           ],
                         ),
-
-                        // Container(
-                        //   height: 250,
-                        //   child: GridView.builder(
-                        //       itemCount:
-                        //           snapshot.data["data"][0]["video_path"].length,
-                        //       gridDelegate:
-                        //           SliverGridDelegateWithFixedCrossAxisCount(
-                        //               crossAxisCount: 1),
-                        //       itemBuilder: (context, index) {
-                        //         return GridTile(
-                        //           child: NativeVideoView(
-                        //             keepAspectRatio: true,
-                        //             showMediaController: true,
-                        //             onCreated: (controller) {
-                        //               controller.setVideoSource(
-                        //                 'https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
-                        //                 sourceType: VideoSourceType.network,
-                        //               );
-                        //             },
-                        //             onPrepared: (controller, info) {
-                        //               controller.play();
-                        //             },
-                        //             onError:
-                        //                 (controller, what, extra, message) {
-                        //               print(
-                        //                   'Player Error ($what | $extra | $message)');
-                        //             },
-                        //             onCompletion: (controller) {
-                        //               print('Video completed');
-                        //             },
-                        //             onProgress: (progress, duration) {
-                        //               print('$progress | $duration');
-                        //             },
-                        //           ),
-                        //         );
-                        //       }),
-                        // ),
                       ],
                     ),
                   );
@@ -437,7 +385,9 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                   );
                 else
                   // return CameoDetailShimmer();
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
               }),
         ),
       ),
@@ -447,7 +397,6 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
   @override
   void dispose() {
     // TODO: implement dispose
-    _videController.dispose();
     _controller.dispose();
     super.dispose();
   }

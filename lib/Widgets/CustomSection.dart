@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
+import 'package:cameo/Network/networkHelper.dart';
 import 'CustomCard.dart';
 
 // ignore: must_be_immutable
@@ -51,8 +52,7 @@ class _CustomSectionState extends State<CustomSection> {
                 itemBuilder: (context, index) => CustomCard(
                       name: widget.cardItems[index]["title"],
                       position: widget.cardItems[index]["gig_details"],
-                      url:
-                          'https://cameo.deliveryventure.com/${widget.cardItems[index]["gig_image"]}',
+                      url: '$domainUrl/${widget.cardItems[index]["gig_image"]}',
                       price: widget.cardItems[index]["gig_price"],
                       id: widget.cardItems[index]["id"],
                     )))

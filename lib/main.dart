@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cameo/Network/networkHelper.dart';
 import 'package:cameo/Screens/CameoDetailScreen.dart';
 import 'package:cameo/Screens/ChatScreen.dart';
 import 'package:cameo/Screens/MainScreen.dart';
@@ -8,23 +9,28 @@ import 'package:cameo/Screens/SignupScreen.dart';
 import 'package:cameo/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'Screens/LoginScreen.dart';
 import 'Screens/WelcomeScreen.dart';
+import 'models/user_model.dart';
 
 void main() async {
   HttpOverrides.global = new MyHttpOverrides();
   Function initialWidget;
+  ApiHelper apiHelper = ApiHelper();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FlutterSecureStorage storage = FlutterSecureStorage();
   String isLoggedIn = await storage.read(key: "user_id");
   if (isLoggedIn == null)
     initialWidget = (context) => WelcomeScreen();
-  else
+  else {
+    var userJson = await apiHelper.userDetiail(isLoggedIn);
+    Get.put(User.fromJson(userJson[0]));
     initialWidget = (context) => MainScreen();
+  }
+
   runApp(MainActivity(initialWidget));
 }
 

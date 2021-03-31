@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:cameo/Network/oauth_helper.dart';
-import 'package:cameo/Network/userSesionHelper.dart';
 import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
-import 'package:cameo/providers/user_provider.dart';
+import 'package:cameo/models/user_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:cameo/utils.dart';
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:cameo/constants.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,7 +20,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final UserSession userSession = UserSession();
   final storage = new FlutterSecureStorage();
   String email;
   String password;
@@ -175,9 +174,11 @@ class _LoginScreenState extends State<LoginScreen> {
       Map data = jsonDecode(res.body);
       switch (data["code"]) {
         case 200:
-          userSession.presistUser(
-              token: data["data"][0]["userid"],
-              username: data["data"][0]["username"]);
+          await FlutterSecureStorage()
+              .write(key: "user_id", value: data["data"][0]["userid"]);
+          var user = await apiHelper.userDetiail(data["data"][0]["userid"]);
+          Get.delete<User>();
+          Get.put(User.fromJson(user[0]));
           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
           break;
         case 404:

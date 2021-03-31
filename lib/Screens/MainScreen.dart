@@ -1,12 +1,11 @@
 import 'package:cameo/MockData/data.dart';
-import 'package:cameo/Network/userSesionHelper.dart';
 import 'package:cameo/Widgets/CustomAppBar.dart';
 import 'package:cameo/Widgets/CustomDrawer.dart';
 import 'package:cameo/Widgets/CustomSection.dart';
 import 'SearchResult.dart';
-import 'package:cameo/Widgets/Popups%20and%20Dialogs/SearchAlertDialog.dart';
 import 'package:cameo/Widgets/Teaser.dart';
 import 'package:cameo/constants.dart';
+// ignore: implementation_imports
 import 'package:flutter/src/material/refresh_indicator.dart' as baseRefresh;
 import 'package:cameo/utils.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
@@ -15,17 +14,13 @@ import 'package:flutter/material.dart';
 import 'package:cameo/Network/networkHelper.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen>
-    with AutomaticKeepAliveClientMixin {
-  @override
-  bool get wantKeepAlive => false;
+class _MainScreenState extends State<MainScreen> {
   List popularCameo;
   ApiHelper apiHelper = ApiHelper();
   TextEditingController searchController = TextEditingController();
@@ -33,7 +28,6 @@ class _MainScreenState extends State<MainScreen>
   List latestCameo;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   FlutterSecureStorage _storage = FlutterSecureStorage();
-  UserSession _userSession = UserSession();
   final GlobalKey<baseRefresh.RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<baseRefresh.RefreshIndicatorState>();
   @override

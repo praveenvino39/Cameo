@@ -45,6 +45,12 @@ dependencies:
   firebase_auth: 
   google_sign_in:
   chewie:
+  http_auth:
+  webview_flutter:
+  flutter_paytabs_bridge_emulator: ^1.0.8
+  stripe_payment: ^1.0.11
+  flutter_credit_card: ^0.1.4
+  lottie:
 
 dev_dependencies:
   flutter_test:
@@ -61,6 +67,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/animations/
   # fonts:
   #   - family: Schyler
   #     fonts:

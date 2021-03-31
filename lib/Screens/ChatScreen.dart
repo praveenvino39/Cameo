@@ -5,17 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_1.dart';
+import 'package:get/get.dart';
 
 // ignore: must_be_immutable
 class ChatScreen extends StatefulWidget {
-  int userId;
-  String username;
-  ChatScreen({this.userId, this.username});
+  ChatScreen();
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  String userId = Get.arguments["user_id"];
+  String username = Get.arguments["username"];
   TextEditingController _message = TextEditingController();
   ScrollController _controller = ScrollController();
   List messages = [];
@@ -24,7 +25,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(titleCase(string: widget.username)),
+        title: Text(titleCase(string: username)),
         actions: [
           IconButton(
             icon: Icon(Icons.share),
@@ -45,7 +46,7 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Stack(
         children: [
           FutureBuilder(
-            future: ApiHelper().getMessages(id: widget.userId),
+            future: ApiHelper().getMessages(id: userId),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 messages = snapshot.data["data"];
@@ -170,12 +171,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         onPressed: () async {
                           if (_message.text.length > 0) {
                             var data = await ApiHelper().sendMessage(
-                                receiverId: widget.userId,
-                                message: _message.text);
+                                receiverId: userId, message: _message.text);
                             if (data != null) {
                               if (data["status"]) {
-                                var temp = await ApiHelper()
-                                    .getMessages(id: widget.userId);
+                                var temp =
+                                    await ApiHelper().getMessages(id: userId);
                                 setState(() {
                                   messages = temp["data"];
                                 });

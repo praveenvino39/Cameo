@@ -1,8 +1,10 @@
+import 'package:cameo/MockData/data.dart';
 import 'package:cameo/Network/networkHelper.dart';
 import 'package:cameo/Screens/ChatScreen.dart';
 import 'package:cameo/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class MessagesScreen extends StatelessWidget {
   @override
@@ -23,17 +25,12 @@ class MessagesScreen extends StatelessWidget {
                     return ListView.builder(
                       itemCount: snapshot.data.length,
                       itemBuilder: (context, index) => ListTile(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ChatScreen(
-                              userId:
-                                  int.parse(snapshot.data[index]["chat_from"]),
-                              username:
-                                  snapshot.data[index]["from_user"].toString(),
-                            ),
-                          ),
-                        ),
+                        onTap: () {
+                          Get.to(() => ChatScreen(), arguments: {
+                            "user_id": snapshot.data[index]["chat_from"],
+                            "username": snapshot.data[index]["from_user"]
+                          });
+                        },
                         leading: CircleAvatar(
                           child: Icon(Icons.person),
                         ),

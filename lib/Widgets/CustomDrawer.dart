@@ -12,13 +12,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:shimmer/shimmer.dart';
+import '../models/user_model.dart' as localUser;
 
 import '../constants.dart';
 
 class CustomDrawer extends StatelessWidget {
   final storage = new FlutterSecureStorage();
+  final localUser.User user = Get.find<localUser.User>();
 
   @override
   Widget build(BuildContext context) {
@@ -61,35 +64,10 @@ class CustomDrawer extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  FutureBuilder(
-                      future: FlutterSecureStorage().read(key: "username"),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return Text(
-                            snapshot.data,
-                            style: kCardName,
-                          );
-                        } else {
-                          return Shimmer.fromColors(
-                              period: Duration(milliseconds: 500),
-                              baseColor: Colors.grey[300],
-                              highlightColor: Colors.white,
-                              enabled: true,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Container(
-                                  color: Colors.green,
-                                  width: 100,
-                                  // child: Text(
-                                  //   "Username",
-                                  //   style: kCardName,
-                                  // ),
-
-                                  height: 20,
-                                ),
-                              ));
-                        }
-                      }),
+                  Text(
+                    user.username,
+                    style: kCardName,
+                  ),
                 ],
               ),
             ),

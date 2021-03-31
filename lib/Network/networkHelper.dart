@@ -1,16 +1,26 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io' as os;
 
+import 'package:cameo/Network/PaypalPayment.dart';
+import 'package:cameo/Network/stripe/StripeCardScreen.dart';
+import 'package:cameo/Screens/PaymentStatusScreen.dart';
+import 'package:cameo/constants.dart';
+import 'package:cameo/models/cameo_model.dart';
+import 'package:cameo/models/user_model.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
+import '../utils.dart';
+
 // http://ec2-54-189-124-142.us-west-2.compute.amazonaws.com/
-const baseUrl = 'http://ec2-54-189-124-142.us-west-2.compute.amazonaws.com/api';
-const domainUrl = 'http://ec2-54-189-124-142.us-west-2.compute.amazonaws.com';
+const baseUrl = 'https://cameo.deliveryventure.com/api';
+const domainUrl = 'https://cameo.deliveryventure.com';
 
 const endPoints = {
   //authentication and authorization
@@ -237,6 +247,7 @@ class ApiHelper {
     try {
       dio.Response response =
           await dio.Dio().get('$baseUrl${endPoints["activities"]}$userId');
+      print(response.data);
       return response.data["data"];
     } catch (e) {
       print(e.toString());
@@ -517,5 +528,125 @@ class ApiHelper {
     // Map convertedData = jsonDecode(data);
     print(data);
     // return data;
+  }
+
+  //Order
+
+  void createOrder({String source, Cameo cameo}) async {
+    User user = Get.find<User>();
+    Get.back();
+    Get.defaultDialog(
+        barrierDismissible: false,
+        title: "Please wait",
+        content: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation(kSecondaryColor),
+          ),
+        ));
+    var response = await http
+        .post("https://cameo.deliveryventure.com/api/gigs/save_payment", body: {
+      "gigs_id": cameo.gigsDetails.id,
+      "seller_id": cameo.gigsDetails.userId,
+      "USERID": user.userid,
+      "time_zone": "Asia/Kolkata",
+      "item_amount": cameo.gigsDetails.gigPrice,
+      "dollar_amount": cameo.gigsDetails.gigPrice,
+      "gig_price": cameo.gigsDetails.gigPrice,
+      "extra_gig_ref": "",
+      "currency_type": cameo.gigsDetails.currencyType,
+      "currency": cameo.gigsDetails.currencySign,
+      "payment_super_fast_delivery": "1",
+      "status": "1",
+      "source": source
+    });
+
+    Map serverStatus = jsonDecode(response.body);
+    var itemNumber = serverStatus["message"]["item_number"].toString();
+    if (serverStatus["status"] == true) {
+      switch (source) {
+        case "paypal":
+          Get.to(
+            () {
+              var cameoTitle =
+                  "${titleCase(string: cameo.gigsDetails.title)}\'s cameo";
+              return PaypalPayment(
+                onFinish: (serverResponse) async {
+                  // payment done
+                  print(serverResponse);
+                  this.updatePaypalPaymentSuccess(
+                      itemNumber: itemNumber, serverResponse: serverResponse);
+                },
+                itemName: cameoTitle,
+                itemPrice: cameo.gigsDetails.gigPrice,
+                currency: cameo.gigsDetails.currencyType,
+                itemNumber: itemNumber,
+              );
+            },
+          );
+
+          break;
+
+        case "stripe":
+          Get.back();
+          Get.to(() => StripeCardScreen(),
+              arguments: {"cameo": cameo, "item_number": itemNumber});
+          break;
+        default:
+      }
+    } else {
+      Get.snackbar(
+        "",
+        "",
+        margin: EdgeInsets.all(0),
+        borderRadius: 0,
+        backgroundColor: Colors.red,
+        titleText: Text("Error", style: TextStyle(color: Colors.white)),
+        messageText: Text(
+          "Something went wrong, try again later",
+          style: TextStyle(color: Colors.white),
+        ),
+      );
+    }
+  }
+
+  void updatePaypalPaymentSuccess(
+      {String itemNumber, String serverResponse}) async {
+    // String mock =
+    //     '{"id":"PAYID-MBM6VNQ3HC99887F3223161W","intent":"sale","state":"approved","cart":"5M586017NB099244M","payer":{"payment_method":"paypal","status":"VERIFIED","payer_info":{"email":"sb-7l6qt5476809@business.example.com","first_name":"John","last_name":"Doe","payer_id":"69NG939PG3ZSE","shipping_address":{"recipient_name":"John Doe","line1":"1 Main St","city":"San Jose","state":"CA","postal_code":"95131","country_code":"US"},"country_code":"US","business_name":"John Doe\'s Test Store"}},"transactions":[{"amount":{"total":"1.00","currency":"USD","details":{"subtotal":"1.00","shipping":"0.00","insurance":"0.00","handling_fee":"0.00","shipping_discount":"0.00","discount":"0.00"}},"payee":{"merchant_id":"H93GCV5FEKSVJ","email":"sb-tdpsu3320676@business.example.com"},"description":"The payment transaction description.","item_list":{"items":[{"name":"Mick Foley\'s cameo","price":"1.00","currency":"USD","tax":"0.00","quantity":1}],"shipping_address":{"recipient_name":"John Doe","line1":"1 Main St","city":"San Jose","state":"CA","postal_code":"95131","country_code":"US"}},"related_resources":[{"sale":{"id":"7FS80907E18059042","state":"completed","amount":{"total":"1.00","currency":"USD","details":{"subtotal":"1.00","shipping":"0.00","insurance":"0.00","handling_fee":"0.00","shipping_discount":"0.00","discount":"0.00"}},"payment_mode":"INSTANT_TRANSFER","protection_eligibility":"ELIGIBLE","protection_eligibility_type":"ITEM_NOT_RECEIVED_ELIGIBLE,UNAUTHORIZED_PAYMENT_ELIGIBLE","transaction_fee":{"value":"0.40","currency":"USD"},"parent_payment":"PAYID-MBM6VNQ3HC99887F3223161W","create_time":"2021-03-23T13:20:12Z","update_time":"2021-03-23T13:20:12Z","links":[{"href":"https://api.sandbox.paypal.com/v1/payments/sale/7FS80907E18059042","rel":"self","method":"GET"},{"href":"https://api.sandbox.paypal.com/v1/payments/sale/7FS80907E18059042/refund","rel":"refund","method":"POST"},{"href":"https://api.sandbox.paypal.com/v1/payments/payment/PAYID-MBM6VNQ3HC99887F3223161W","rel":"parent_payment","method":"GET"}]}}]}],"failed_transactions":[],"create_time":"2021-03-23T13:18:45Z","update_time":"2021-03-23T13:20:12Z","links":[{"href":"https://api.sandbox.paypal.com/v1/payments/payment/PAYID-MBM6VNQ3HC99887F3223161W","rel":"self","method":"GET"}]}';
+    Map convertedJson = jsonDecode(serverResponse);
+    // print(convertedJson);
+    http.Response response =
+        await http.post("$baseUrl/gigs/pay_success", body: {
+      "item_number": itemNumber,
+      "response": jsonEncode(convertedJson),
+      "payment_type": "paypal"
+    });
+    print(response.body);
+    var convertedResponse = jsonDecode(response.body);
+    if (convertedResponse["status"] == true) {
+      Get.back();
+
+      Get.to(() => PaymentStatusScreen(), arguments: {"payment_status": true});
+    }
+  }
+
+  void updateStripePaymentSuccess(
+      {String itemNumber, String serverResponse}) async {
+    var mock =
+        '{"id":"pi_1IZaHsGDJI6B9tkqeoYOnXvW","object":"payment_intent","amount":500,"amount_capturable":0,"amount_received":500,"application":null,"application_fee_amount":null,"canceled_at":null,"cancellation_reason":null,"capture_method":"automatic","charges":{"object":"list","data":[{"id":"ch_1IZaHtGDJI6B9tkqS194z0WY","object":"charge","amount":500,"amount_captured":500,"amount_refunded":0,"application":null,"application_fee":null,"application_fee_amount":null,"balance_transaction":"txn_1IZaHuGDJI6B9tkqYoxN5MOr","billing_details":{"address":{"city":null,"country":null,"line1":null,"line2":null,"postal_code":null,"state":null},"email":null,"name":null,"phone":null},"calculated_statement_descriptor":"Stripe","captured":true,"created":1616844401,"currency":"usd","customer":null,"description":"ernie hudson","destination":null,"dispute":null,"disputed":false,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","risk_score":3,"seller_message":"Payment complete.","type":"authorized"},"paid":true,"payment_intent":"pi_1IZaHsGDJI6B9tkqeoYOnXvW","payment_method":"pm_1IZaHsGDJI6B9tkqk7GewfJy","payment_method_details":{"card":{"brand":"visa","checks":{"address_line1_check":null,"address_postal_code_check":null,"cvc_check":"pass"},"country":"US","exp_month":12,"exp_year":2023,"fingerprint":"fJKsaPQeF9Uo9rbT","funding":"credit","installments":null,"last4":"4242","network":"visa","three_d_secure":null,"wallet":null},"type":"card"},"receipt_email":null,"receipt_number":null,"receipt_url":"https://pay.stripe.com/receipts/acct_1Fm42FGDJI6B9tkq/ch_1IZaHtGDJI6B9tkqS194z0WY/rcpt_JByEKz2BqurDgwaewFTAsQaH4H1Was0","refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1IZaHtGDJI6B9tkqS194z0WY/refunds"},"review":null,"shipping":{"address":{"city":"Chennai","country":"Angola","line1":"12, new york, us","line2":null,"postal_code":"600035","state":"Chennai"},"carrier":null,"name":"Demouser","phone":null,"tracking_number":null},"source":null,"source_transfer":null,"statement_descriptor":null,"statement_descriptor_suffix":null,"status":"succeeded","transfer_data":null,"transfer_group":null}],"has_more":false,"total_count":1,"url":"/v1/charges?payment_intent=pi_1IZaHsGDJI6B9tkqeoYOnXvW"},"client_secret":"pi_1IZaHsGDJI6B9tkqeoYOnXvW_secret_IzhCSmYsZV4AUYYOO9SKWPESD","confirmation_method":"automatic","created":1616844400,"currency":"usd","customer":null,"description":"ernie hudson","invoice":null,"last_payment_error":null,"livemode":false,"metadata":{},"next_action":null,"on_behalf_of":null,"payment_method":"pm_1IZaHsGDJI6B9tkqk7GewfJy","payment_method_options":{"card":{"installments":null,"network":null,"request_three_d_secure":"automatic"}},"payment_method_types":["card"],"receipt_email":null,"review":null,"setup_future_usage":null,"shipping":{"address":{"city":"Chennai","country":"Angola","line1":"12, new york, us","line2":null,"postal_code":"600035","state":"Chennai"},"carrier":null,"name":"Demouser","phone":null,"tracking_number":null},"source":null,"statement_descriptor":null,"statement_descriptor_suffix":null,"status":"succeeded","transfer_data":null,"transfer_group":null}';
+    // Map convertedJson = jsonDecode(serverResponse);
+    http.Response response = await http.post("$baseUrl/gigs/pay_success",
+        body: {
+          "item_number": itemNumber,
+          "response": serverResponse,
+          "payment_type": "stripe"
+        });
+    print(response.body);
+    var convertedResponse = jsonDecode(response.body);
+    if (convertedResponse["status"] == true) {
+      Get.back();
+
+      Get.to(() => PaymentStatusScreen(), arguments: {"payment_status": true});
+    }
   }
 }

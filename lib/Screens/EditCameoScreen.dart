@@ -7,6 +7,7 @@ import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
 import 'package:cameo/constants.dart';
 import 'package:cameo/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 PickedFile pickedImage, pckvid;
@@ -560,13 +561,8 @@ class _EditCameoScreenState extends State<EditCameoScreen> {
                         imageArray: imageArray,
                         gigId: gig_id);
                     if (data != null) if (data["message"] == "success") {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                CameoDetailScreen(id: int.parse(gig_id)),
-                          ),
-                          ModalRoute.withName('/'));
+                      Get.offNamedUntil('/detail', (route) => route.isFirst,
+                          arguments: {"cameo_id": gig_id});
                     }
                   } else {
                     print(

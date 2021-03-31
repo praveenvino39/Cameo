@@ -7,8 +7,10 @@ class SvgButton extends StatelessWidget {
   final Color backgroundColor;
   final double svgSize;
   final String title;
+  final Function onPressed;
   const SvgButton({
     Key key,
+    this.onPressed,
     this.assetPath,
     this.backgroundColor,
     this.svgSize,
@@ -20,7 +22,7 @@ class SvgButton extends StatelessWidget {
     return Container(
       width: 190,
       child: OutlineButton(
-        onPressed: () => {},
+        onPressed: onPressed,
         highlightColor: Colors.transparent,
         shape: new RoundedRectangleBorder(
             borderRadius: new BorderRadius.circular(30.0)),
@@ -39,20 +41,3 @@ class SvgButton extends StatelessWidget {
     );
   }
 }
-
-// child: FlatButton(
-//   padding: EdgeInsets.all(0),
-//   onPressed: () => {},
-//   color: backgroundColor,
-//   child: Row(
-//     mainAxisAlignment: MainAxisAlignment.center,
-//     children: [
-//       SvgPicture.asset(
-//         assetPath,
-//         width: svgSize,
-//       ),
-//       width(10.0),
-//       Text(title)
-//     ],
-//   ),
-// ),

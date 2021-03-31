@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cameo/Screens/CameoDetailScreen.dart';
 import 'package:cameo/constants.dart';
+import 'package:cameo/controller/cameo_controller.dart';
 import 'package:cameo/utils.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart' as dom;
+import 'package:shimmer/shimmer.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +20,6 @@ class CustomCard extends StatefulWidget {
   CustomCard(
       {Key key, String name, String position, String url, var price, var id}) {
     this.name = name;
-    dom.Document document = parse(position);
     // this.position = document.getElementsByTagName('strong')[0].innerHtml;
     this.position = position;
     this.url = url;
@@ -35,11 +37,13 @@ class _CustomCardState extends State<CustomCard> {
       padding: const EdgeInsets.all(8.0),
       child: InkWell(
         child: GestureDetector(
-          onTap: () => {
-            Navigator.push(
-                context,
-                CupertinoPageRoute(
-                    builder: (context) => CameoDetailScreen(id: widget.id)))
+          onTap: () {
+            Get.to(
+              () => CameoDetailScreen(),
+              arguments: {"cameo_id": widget.id.toString()},
+              transition: Transition.rightToLeft,
+              duration: Duration(milliseconds: 300),
+            );
           },
           child: Container(
             width: 200,
@@ -69,8 +73,13 @@ class _CustomCardState extends State<CustomCard> {
                           imageUrl: widget.url,
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) => Center(
-                            child: CircularProgressIndicator(
-                                value: downloadProgress.progress),
+                            child: Shimmer.fromColors(
+                                child: Container(
+                                  width: 200,
+                                  height: 200,
+                                ),
+                                baseColor: Colors.grey.shade800,
+                                highlightColor: Colors.grey),
                           ),
                           errorWidget: (context, url, error) =>
                               Icon(Icons.error),

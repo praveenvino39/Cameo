@@ -1,23 +1,22 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cameo/Network/networkHelper.dart';
-import 'package:cameo/Network/userSesionHelper.dart';
-import 'package:cameo/Screens/ChatScreen.dart';
-import 'package:cameo/Screens/EditCameoScreen.dart';
+import 'package:cameo/Widgets/CallToActionButtons.dart';
 import 'package:cameo/Widgets/CameoInfoCardContainer.dart';
-import 'package:cameo/Widgets/Popups%20and%20Dialogs/PaymentPopup.dart';
-
+import 'package:cameo/Widgets/VideoPlayerWidget.dart';
 import 'package:cameo/constants.dart';
+import 'package:cameo/controller/cameo_controller.dart';
+import 'package:cameo/models/cameo_model.dart';
+import 'package:cameo/models/user_model.dart';
 import 'package:cameo/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:vimeoplayer/vimeoplayer.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class CameoDetailScreen extends StatefulWidget {
-  final int id;
-
-  CameoDetailScreen({Key key, this.id}) : super(key: key);
+  CameoDetailScreen({Key key}) : super(key: key);
 
   @override
   _CameoDetailScreenState createState() => _CameoDetailScreenState();
@@ -26,10 +25,11 @@ class CameoDetailScreen extends StatefulWidget {
 class _CameoDetailScreenState extends State<CameoDetailScreen> {
   final GlobalKey scaffold = GlobalKey<ScaffoldState>();
   final ApiHelper apiHelper = ApiHelper();
-  UserSession userSession = UserSession();
-  String currentUserId;
+  User currentUser = Get.find<User>();
   YoutubePlayerController _controller;
-
+  CameoController cameoController = CameoController();
+  Cameo cameo;
+  final String cameoId = Get.arguments["cameo_id"];
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -43,11 +43,10 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
         child: Scaffold(
           backgroundColor: kBodyBackgroundColor,
           body: FutureBuilder(
-              future: apiHelper.cameoDetail(widget.id),
+              future: cameoController.getCameobyId(gigId: cameoId),
               builder: (context, snapshot) {
-                if (snapshot.hasData) if (snapshot
-                        .data["data"][0]["gigs_details"].length >
-                    0) {
+                cameo = snapshot.data;
+                if (snapshot.hasData) {
                   Uri youtubeVideoId =
                       Uri.parse('https://www.youtube.com/watch?v=i74Lxs9Zjhg');
 
@@ -76,7 +75,7 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                                     CircleAvatar(
                                       radius: 56,
                                       backgroundImage: CachedNetworkImageProvider(
-                                          '$domainUrl/${snapshot.data["data"][0]["gigs_details"]["image"]}'),
+                                          '$domainUrl/${cameo.gigsDetails.image}'),
                                     ),
                                     width(20.0),
                                     Column(
@@ -92,8 +91,8 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                                               2.2,
                                           child: Text(
                                             titleCase(
-                                                string: snapshot.data["data"][0]
-                                                    ["gigs_details"]["title"]),
+                                                string:
+                                                    cameo.gigsDetails.title),
                                             style: TextStyle(
                                                 fontSize: 25,
                                                 fontWeight: FontWeight.bold,
@@ -107,8 +106,7 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                                                   .width /
                                               1.8,
                                           child: Text(
-                                            snapshot.data["data"][0]
-                                                ["gigs_details"]["gig_details"],
+                                            cameo.gigsDetails.gigDetails,
                                             style: TextStyle(
                                                 fontSize: 17,
                                                 color: Colors.white70,
@@ -127,8 +125,7 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 20.0),
                           child: Container(
                             child: Text(
-                              snapshot.data["data"][0]["gigs_details"]
-                                  ["gig_details"],
+                              cameo.gigsDetails.gigDetails,
                               style: TextStyle(
                                   letterSpacing: 1.5,
                                   fontSize: 17,
@@ -140,157 +137,9 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: CaemoInfoCardContainer(
-                            responseIn: snapshot.data["data"][0]["gigs_details"]
-                                ["delivering_days"],
-                          ),
+                              responseIn: cameo.gigsDetails.deliveringDays),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                          child: Container(
-                            width: double.infinity,
-                            height: 60,
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(100)),
-                            child: FutureBuilder(
-                                future: UserSession().getCurrentUserId(),
-                                builder: (context, userSnapshot) {
-                                  if (userSnapshot.hasData) {
-                                    currentUserId =
-                                        userSnapshot.data.toString();
-                                    if (userSnapshot.data.toString() ==
-                                        snapshot.data["data"][0]["gigs_details"]
-                                            ["user_id"]) {
-                                      return FlatButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            CupertinoPageRoute(
-                                              builder: (context) =>
-                                                  EditCameoScreen(
-                                                cameoDetail:
-                                                    snapshot.data["data"][0]
-                                                        ["gigs_details"],
-                                                videos: snapshot.data["data"][0]
-                                                    ["video_path"],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: Text(
-                                          'Edit Cameo',
-                                          style: kAuthTitleStyle.copyWith(
-                                              color: Colors.white,
-                                              fontSize: 24),
-                                        ),
-                                        color: Color(0xffff037c),
-                                      );
-                                    } else {
-                                      return FlatButton(
-                                        onPressed: () {
-                                          return showDialog(
-                                            context: context,
-                                            builder: (context) => PaymentPopup(
-                                              price: double.parse(
-                                                  snapshot.data["data"][0]
-                                                          ["gigs_details"]
-                                                      ["gig_price"]),
-                                              paymentTo: int.parse(
-                                                  snapshot.data["data"][0]
-                                                      ["gigs_details"]["id"]),
-                                              paymentFrom: 10,
-                                            ),
-                                          );
-                                        },
-                                        child: Text(
-                                          'Request ${snapshot.data["data"][0]["gigs_details"]["currency_sign"]}${snapshot.data["data"][0]["gigs_details"]["gig_price"]}',
-                                          style: kAuthTitleStyle.copyWith(
-                                              color: Colors.white,
-                                              fontSize: 24),
-                                        ),
-                                        color: Color(0xffff037c),
-                                      );
-                                    }
-                                  } else {
-                                    return FlatButton(
-                                      onPressed: () {
-                                        return showDialog(
-                                          context: context,
-                                          builder: (context) => PaymentPopup(
-                                            price: double.parse(snapshot
-                                                    .data["data"][0]
-                                                ["gigs_details"]["gig_price"]),
-                                            paymentTo: int.parse(
-                                                snapshot.data["data"][0]
-                                                    ["gigs_details"]["id"]),
-                                            paymentFrom: 10,
-                                          ),
-                                        );
-                                      },
-                                      child: CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation(
-                                            Colors.white),
-                                      ),
-                                      color: Color(0xffff037c),
-                                    );
-                                  }
-                                }),
-                          ),
-                        ),
-                        FutureBuilder(
-                          future: UserSession().getCurrentUserId(),
-                          builder: (context, userSnapshot) {
-                            if (userSnapshot.hasData) {
-                              if (userSnapshot.data !=
-                                  snapshot.data["data"][0]["gigs_details"]
-                                      ["user_id"]) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 18.0, vertical: 10),
-                                  child: Container(
-                                      width: double.infinity,
-                                      height: 60,
-                                      clipBehavior: Clip.hardEdge,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(100)),
-                                      child: FlatButton(
-                                        onPressed: () async {
-                                          Navigator.push(
-                                            context,
-                                            CupertinoPageRoute(
-                                              builder: (context) => ChatScreen(
-                                                userId: int.parse(
-                                                    snapshot.data["data"][0]
-                                                            ["gigs_details"]
-                                                        ["user_id"]),
-                                                username: snapshot.data["data"]
-                                                        [0]["gigs_details"]
-                                                    ["title"],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: Text(
-                                          'Chat ',
-                                          style: kAuthTitleStyle.copyWith(
-                                              color: Colors.white,
-                                              fontSize: 24),
-                                        ),
-                                        color: Color(0xffff037c),
-                                      )),
-                                );
-                              } else {
-                                return height(0.0);
-                              }
-                            } else {
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            }
-                          },
-                        ),
-                        height(30.0),
+                        callToActionButtons(cameo: cameo, user: currentUser),
                         Text(
                           "LATEST CAMEOS",
                           textAlign: TextAlign.center,
@@ -350,26 +199,28 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                               child:
                                   VimeoPlayer(id: '395212534', autoPlay: false),
                             ),
+                            Container(
+                              height: 200,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: cameo.videoPath.length,
+                                itemBuilder: (context, index) => Container(
+                                  padding: EdgeInsets.only(right: 10),
+                                  width: 300,
+                                  height: 200,
+                                  child: VideoExample(
+                                    videoUrl: cameo.videoPath[index]
+                                        ["video_path"],
+                                  ),
+                                ),
+                              ),
+                            )
                           ],
                         ),
                       ],
                     ),
                   );
-                } else {
-                  return Center(
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.error,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                      title: Text(
-                          "Something went wrong, try again after sometime",
-                          style: TextStyle(fontSize: 24, color: Colors.white)),
-                    ),
-                  );
                 }
-
                 if (snapshot.hasError)
                   return Center(
                     child: ListTile(
@@ -399,5 +250,28 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
     // TODO: implement dispose
     _controller.dispose();
     super.dispose();
+  }
+}
+
+class CustomButton extends StatelessWidget {
+  CustomButton({
+    Key key,
+    @required this.onPressed,
+    @required this.buttonText,
+  }) : super(key: key);
+
+  final String buttonText;
+  Function onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      onPressed: onPressed,
+      child: Text(
+        buttonText,
+        style: kAuthTitleStyle.copyWith(color: Colors.white, fontSize: 16),
+      ),
+      color: Color(0xffff037c),
+    );
   }
 }

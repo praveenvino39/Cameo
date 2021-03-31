@@ -4,6 +4,7 @@ import 'package:cameo/Screens/CameoDetailScreen.dart';
 import 'package:cameo/constants.dart';
 import 'package:cameo/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 
 class SearchResult extends StatefulWidget {
@@ -32,10 +33,8 @@ class _SearchResultState extends State<SearchResult> {
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, crossAxisSpacing: 5, mainAxisSpacing: 5),
                 itemBuilder: (context, index) => GestureDetector(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => CameoDetailScreen(
-                            id: int.parse(snapshot.data[index]["id"]),
-                          ))),
+                  onTap: () => Get.to(() => CameoDetailScreen(),
+                      arguments: {"cameo_id": snapshot.data[index]["id"]}),
                   child: GridTile(
                     child: Container(
                       height: 100,

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cameo/Screens/BuyScreen.dart';
+import 'package:cameo/Screens/BuyScreen.dart';
 import 'package:cameo/Screens/MyCameoScreen.dart';
 import 'package:cameo/Screens/EditUserProfileScreen.dart';
 import 'package:cameo/Screens/MyFileScreen.dart';

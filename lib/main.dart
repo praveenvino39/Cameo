@@ -9,6 +9,7 @@ import 'package:cameo/Screens/SignupScreen.dart';
 import 'package:cameo/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'Screens/LoginScreen.dart';
@@ -56,6 +57,9 @@ class _MainActivityState extends State<MainActivity> {
             unselectedWidgetColor: kSecondaryColor,
             primarySwatch: Colors.pink),
         debugShowCheckedModeBanner: false,
+        navigatorObservers: [
+          ClearFocusOnPop()
+        ],
         routes: {
           '/': widget.initialWidget,
           '/welcome': (context) => WelcomeScreen(),
@@ -76,5 +80,16 @@ class MyHttpOverrides extends HttpOverrides {
     return super.createHttpClient(context)
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
+  }
+}
+
+class ClearFocusOnPop extends NavigatorObserver {
+  @override
+  void didPop(Route route, Route previousRoute) {
+    super.didPop(route, previousRoute);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(Duration.zero);
+      SystemChannels.textInput.invokeMethod('TextInput.hide');
+    });
   }
 }

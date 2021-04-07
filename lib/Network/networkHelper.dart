@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io' as os;
 
 import 'package:cameo/Network/PaypalPayment.dart';
@@ -14,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 
 import '../utils.dart';
 
@@ -124,9 +122,10 @@ class ApiHelper {
 
   //Get User detail
   Future<List> userDetiail(id) async {
-    print('calling: $baseUrl${endPoints["user_detail"]}$id');
+    var userId = await FlutterSecureStorage().read(key: "user_id");
+    print('calling: $baseUrl${endPoints["user_detail"]}$userId');
     http.Response response =
-        await http.get('$baseUrl${endPoints["user_detail"]}$id');
+        await http.get('$baseUrl${endPoints["user_detail"]}$userId');
     Map data = jsonDecode(response.body);
     return data["message"];
   }

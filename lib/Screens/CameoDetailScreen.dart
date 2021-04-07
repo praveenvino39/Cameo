@@ -105,13 +105,26 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                                                   .size
                                                   .width /
                                               1.8,
-                                          child: Text(
-                                            cameo.gigsDetails.gigDetails,
-                                            style: TextStyle(
-                                                fontSize: 17,
-                                                color: Colors.white70,
-                                                fontWeight: FontWeight.w300),
-                                          ),
+                                          child: cameo.gigsDetails.gigDetails
+                                                      .length >
+                                                  20
+                                              ? Text(
+                                                  cameo.gigsDetails.gigDetails
+                                                      .substring(0, 20),
+                                                  style: TextStyle(
+                                                      fontSize: 17,
+                                                      color: Colors.white70,
+                                                      fontWeight:
+                                                          FontWeight.w300),
+                                                )
+                                              : Text(
+                                                  cameo.gigsDetails.gigDetails,
+                                                  style: TextStyle(
+                                                      fontSize: 17,
+                                                      color: Colors.white70,
+                                                      fontWeight:
+                                                          FontWeight.w300),
+                                                ),
                                         )
                                       ],
                                     )
@@ -127,7 +140,6 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                             child: Text(
                               cameo.gigsDetails.gigDetails,
                               style: TextStyle(
-                                  letterSpacing: 1.5,
                                   fontSize: 17,
                                   color: Colors.white,
                                   fontWeight: FontWeight.w300),
@@ -248,7 +260,10 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
   @override
   void dispose() {
     // TODO: implement dispose
-    _controller.dispose();
+    if (_controller != null) {
+      _controller.dispose();
+    }
+
     super.dispose();
   }
 }

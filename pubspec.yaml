@@ -42,12 +42,12 @@ dependencies:
   get: ^3.26.0
   video_compress: ^2.1.1
   firebase_core: 
-  firebase_auth: 
+  firebase_auth:
+  firebase_messaging: "^8.0.0-dev.15"
   google_sign_in:
   chewie:
   http_auth:
   webview_flutter:
-  flutter_paytabs_bridge_emulator: ^1.0.8
   stripe_payment: ^1.0.11
   flutter_credit_card: ^0.1.4
   lottie:

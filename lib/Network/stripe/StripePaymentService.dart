@@ -75,7 +75,7 @@ class StripeService {
       "shipping[address][line1]": currentUser.address,
       "shipping[address][postal_code]": currentUser.zipcode,
       "shipping[address][city]": currentUser.city,
-      "shipping[address][state]": currentUser.city,
+      "shipping[address][state]": currentUser.stateName,
       "shipping[address][country]": currentUser.countryName,
     });
     if (response.statusCode == 200) {
@@ -106,10 +106,6 @@ class StripeService {
           ApiHelper().updateStripePaymentSuccess(
               itemNumber: itemNumber,
               serverResponse: jsonEncode(paymentResponseParams));
-          // log(jsonEncode(paymentResponseParams));
-          // Get.back();
-          // Get.off(() => PaymentStatusScreen(),
-          //     arguments: {"payment_status": true});
         }
       }
       //

@@ -5,6 +5,7 @@ import 'package:cameo/constants.dart';
 import 'package:cameo/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:get/get.dart';
 import 'package:rich_alert/rich_alert.dart';
 import 'package:http/http.dart' as http;
 
@@ -265,22 +266,28 @@ class _SignupScreenState extends State<SignupScreen> {
       switch (data["code"]) {
         case 200:
           //Show emailAlert popup with login button
-          Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
-          showDialog(
-            context: context,
-            builder: (context) => RichAlertDialog(
-              //uses the custom alert dialo
-              alertTitle: richTitle("Success"),
-              alertSubtitle: richSubtitle(data["message"]),
-              alertType: RichAlertType.SUCCESS,
-              actions: [
-                FlatButton(
-                  child: Text("Login", style: TextStyle(color: Colors.white)),
-                  color: Colors.green,
-                  onPressed: () => Navigator.popAndPushNamed(context, '/login'),
-                )
-              ],
-            ),
+          // Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+          // showDialog(
+          //   context: context,
+          //   builder: (context) => RichAlertDialog(
+          //     //uses the custom alert dialo
+          //     alertTitle: richTitle("Success"),
+          //     alertSubtitle: richSubtitle(data["message"]),
+          //     alertType: RichAlertType.SUCCESS,
+          //     actions: [
+          //       FlatButton(
+          //         child: Text("Login", style: TextStyle(color: Colors.white)),
+          //         color: Colors.green,
+          //         onPressed: () => Navigator.popAndPushNamed(context, '/login'),
+          //       )
+          //     ],
+          //   ),
+          // );
+          Navigator.pop(context);
+          Navigator.pop(context);
+          Get.defaultDialog(
+            middleText: data["message"],
+            titleStyle: TextStyle(color: Colors.yellow.shade800),
           );
           break;
         case 404:

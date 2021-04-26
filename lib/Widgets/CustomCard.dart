@@ -100,7 +100,15 @@ class _CustomCardState extends State<CustomCard> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(titleCase(string: widget.name), style: kCardName),
+                    Container(
+                      height: 23,
+                      child: Text(
+                          titleCase(
+                            string: widget.name,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          style: kCardName),
+                    ),
                     height(6.0),
                     Container(
                       height: 30,

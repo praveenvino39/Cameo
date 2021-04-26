@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cameo/Network/oauth_helper.dart';
 import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
+import 'package:cameo/models/notification_model.dart';
 import 'package:cameo/models/user_model.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:cameo/utils.dart';
@@ -179,44 +180,25 @@ class _LoginScreenState extends State<LoginScreen> {
           var user = await apiHelper.userDetiail(data["data"][0]["userid"]);
           Get.delete<User>();
           Get.put(User.fromJson(user[0]));
+          NotificationList notificationList = await apiHelper.notification();
+          Get.put(notificationList);
           Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
           break;
         case 404:
           Navigator.pop(context);
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              content: Container(
-                height: 80,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.warning,
-                          color: Colors.red,
-                        ),
-                        width(10.0),
-                        Text(data["message"]),
-                      ],
-                    ),
-                    FlatButton(
-                      onPressed: () async => {Navigator.pop(context)},
-                      child: Text(
-                        'Try again',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w300,
-                            color: Colors.white),
-                      ),
-                      color: Colors.yellow.shade800,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
+          Get.defaultDialog(
+              middleText: data["message"],
+              titleStyle: TextStyle(color: Colors.yellow.shade800),
+              actions: [
+                RaisedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "Try again",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  color: Colors.yellow.shade800,
+                )
+              ]);
           break;
         default:
       }

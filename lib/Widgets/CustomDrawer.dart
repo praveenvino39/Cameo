@@ -9,6 +9,7 @@ import 'package:cameo/Network/oauth_helper.dart';
 import 'package:cameo/Screens/MyPurchaseScreen.dart';
 import 'package:cameo/Screens/SaleScreen.dart';
 import 'package:cameo/Screens/SellScreen.dart';
+import 'package:cameo/models/notification_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -71,11 +72,6 @@ class CustomDrawer extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-            ListTile(
-              leading: Icon(Icons.dashboard),
-              title: Text('Dashboard'),
-              onTap: () async => {},
             ),
             ListTile(
               leading: Icon(Icons.video_call),
@@ -149,6 +145,7 @@ class CustomDrawer extends StatelessWidget {
                 try {
                   await storage.delete(key: "user_id");
                   OauthHelper().signOutGoogle();
+                  Get.delete<NotificationList>();
                   Navigator.pushNamedAndRemoveUntil(
                       context, '/welcome', (route) => false);
                 } catch (e) {

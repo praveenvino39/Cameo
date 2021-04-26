@@ -54,72 +54,72 @@ class _SaleScreenState extends State<SaleScreen> {
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              FlatButton(
-                color: Colors.pinkAccent,
-                onPressed: () async {
-                  dateRange = await DateRangePicker.showDatePicker(
-                    context: context,
-                    initialFirstDate: DateTime.now(),
-                    initialLastDate: DateTime.now(),
-                    firstDate: DateTime(2020, 1),
-                    lastDate: DateTime.now(),
-                  );
-                  setState(() {
-                    from = DateFormat('yMMMd').format(dateRange[0]);
-                    to = DateFormat('yMMMd').format(dateRange[1]);
-                  });
-                },
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(
-                    Icons.date_range,
-                    color: Colors.white,
-                  ),
-                  width(10.0),
-                  Text(
-                    "Select date range",
-                    style: TextStyle(color: Colors.white),
-                  )
-                ]),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  to != null
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "From: $from",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 15),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "To: $to",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 15),
-                              ),
-                            ),
-                          ],
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
-                          child: Text(
-                            "All",
-                            style: TextStyle(color: Colors.white, fontSize: 15),
-                          ),
-                        ),
-                  FilterDropDown(
-                    items: dropDownItems,
-                    onChanged: (val) => {},
-                  )
-                ],
-              ),
+              // FlatButton(
+              //   color: Colors.pinkAccent,
+              //   onPressed: () async {
+              //     dateRange = await DateRangePicker.showDatePicker(
+              //       context: context,
+              //       initialFirstDate: DateTime.now(),
+              //       initialLastDate: DateTime.now(),
+              //       firstDate: DateTime(2020, 1),
+              //       lastDate: DateTime.now(),
+              //     );
+              //     setState(() {
+              //       from = DateFormat('yMMMd').format(dateRange[0]);
+              //       to = DateFormat('yMMMd').format(dateRange[1]);
+              //     });
+              //   },
+              //   child:
+              //       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              //     Icon(
+              //       Icons.date_range,
+              //       color: Colors.white,
+              //     ),
+              //     width(10.0),
+              //     Text(
+              //       "Select date range",
+              //       style: TextStyle(color: Colors.white),
+              //     )
+              //   ]),
+              // ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     to != null
+              //         ? Column(
+              //             crossAxisAlignment: CrossAxisAlignment.start,
+              //             children: [
+              //               Padding(
+              //                 padding: const EdgeInsets.all(8.0),
+              //                 child: Text(
+              //                   "From: $from",
+              //                   style: TextStyle(
+              //                       color: Colors.white, fontSize: 15),
+              //                 ),
+              //               ),
+              //               Padding(
+              //                 padding: const EdgeInsets.all(8.0),
+              //                 child: Text(
+              //                   "To: $to",
+              //                   style: TextStyle(
+              //                       color: Colors.white, fontSize: 15),
+              //                 ),
+              //               ),
+              //             ],
+              //           )
+              //         : Padding(
+              //             padding: const EdgeInsets.only(left: 20.0),
+              //             child: Text(
+              //               "All",
+              //               style: TextStyle(color: Colors.white, fontSize: 15),
+              //             ),
+              //           ),
+              //     FilterDropDown(
+              //       items: dropDownItems,
+              //       onChanged: (val) => {},
+              //     )
+              //   ],
+              // ),
               Expanded(
                 child: FutureBuilder(
                   future: ApiHelper().activities(),

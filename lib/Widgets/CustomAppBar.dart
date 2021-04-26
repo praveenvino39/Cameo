@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:cameo/Screens/NotificationScreen.dart';
 import 'package:cameo/constants.dart';
+import 'package:cameo/models/notification_model.dart';
 import 'package:cameo/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,6 +20,7 @@ class CustomAppBar extends StatefulWidget {
 }
 
 class _CustomAppBarState extends State<CustomAppBar> {
+  NotificationList notificationList = Get.find<NotificationList>();
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -26,29 +30,36 @@ class _CustomAppBarState extends State<CustomAppBar> {
           child: CircleAvatar(
             radius: 20,
             backgroundColor: Colors.white,
-            child: Stack(
-              children: [
-                Center(
-                  child: IconButton(
-                      splashRadius: 22,
-                      icon: Icon(Icons.notifications),
-                      onPressed: () => Get.to(() => NotificationScreen())
-                      // Navigator.pushNamed(context, '/notification'),
-                      ),
-                ),
-                Positioned(
-                  child: Container(
-                    padding: EdgeInsets.all(3.5),
-                    decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(1000)),
-                    child: Text(
-                      "12",
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
+            child: Obx(
+              () => Stack(
+                children: [
+                  Center(
+                    child: IconButton(
+                        splashRadius: 22,
+                        icon: Icon(Icons.notifications),
+                        onPressed: () => Get.to(() => NotificationScreen())
+                        // Navigator.pushNamed(context, '/notification'),
+                        ),
                   ),
-                )
-              ],
+                  notificationList.notificationList.length > 0
+                      ? Positioned(
+                          child: Container(
+                            padding: EdgeInsets.all(3.5),
+                            decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(1000)),
+                            child: Obx(
+                              () => Text(
+                                "${notificationList.notificationList.length}",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 12),
+                              ),
+                            ),
+                          ),
+                        )
+                      : height(0.0)
+                ],
+              ),
             ),
           ),
         ),
@@ -82,7 +93,6 @@ class _CustomAppBarState extends State<CustomAppBar> {
           ),
         )
       ],
-      elevation: 0.0,
       flexibleSpace: height(70.0),
       automaticallyImplyLeading: false,
       title: SingleChildScrollView(

@@ -49,7 +49,6 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                 if (snapshot.hasData) {
                   Uri youtubeVideoId =
                       Uri.parse('https://www.youtube.com/watch?v=i74Lxs9Zjhg');
-
                   _controller = YoutubePlayerController(
                     initialVideoId: youtubeVideoId.queryParameters["v"],
                     flags: YoutubePlayerFlags(
@@ -233,7 +232,8 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                     ),
                   );
                 }
-                if (snapshot.hasError)
+                if (snapshot.hasError) {
+                  print(snapshot.error);
                   return Center(
                     child: ListTile(
                       leading: Icon(
@@ -246,7 +246,7 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                           style: TextStyle(fontSize: 24, color: Colors.white)),
                     ),
                   );
-                else
+                } else
                   // return CameoDetailShimmer();
                   return Center(
                     child: CircularProgressIndicator(),

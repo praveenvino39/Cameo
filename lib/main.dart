@@ -7,6 +7,7 @@ import 'package:cameo/Screens/MessageScreen.dart';
 import 'package:cameo/Screens/NotificationScreen.dart';
 import 'package:cameo/Screens/SignupScreen.dart';
 import 'package:cameo/constants.dart';
+import 'package:cameo/models/notification_model.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,6 +30,8 @@ void main() async {
   else {
     var userJson = await apiHelper.userDetiail(isLoggedIn);
     Get.put(User.fromJson(userJson[0]));
+    NotificationList notificationList = await apiHelper.notification();
+    Get.put(notificationList);
     initialWidget = (context) => MainScreen();
   }
 

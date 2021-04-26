@@ -15,7 +15,7 @@ const kSeactionTitle =
 
 const kSeeAllStyle = TextStyle(fontSize: 18, color: Colors.grey);
 
-const kCardName = TextStyle(fontSize: 20, color: Colors.white);
+const kCardName = TextStyle(fontSize: 18, color: Colors.white);
 const kSubText = TextStyle(fontSize: 16, color: Colors.grey);
 
 const kCategoryTitle =

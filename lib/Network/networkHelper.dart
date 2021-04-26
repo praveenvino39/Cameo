@@ -1,11 +1,14 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io' as os;
 
 import 'package:cameo/Network/PaypalPayment.dart';
 import 'package:cameo/Network/stripe/StripeCardScreen.dart';
 import 'package:cameo/Screens/PaymentStatusScreen.dart';
+import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
 import 'package:cameo/constants.dart';
 import 'package:cameo/models/cameo_model.dart';
+import 'package:cameo/models/notification_model.dart';
 import 'package:cameo/models/user_model.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:file_picker/file_picker.dart';
@@ -97,6 +100,7 @@ class ApiHelper {
   Future<List> popularCameos() async {
     print('calling: $baseUrl${endPoints["popular"]}');
     http.Response response = await http.get('$baseUrl${endPoints["popular"]}');
+    log(response.body);
     var data = jsonDecode(response.body);
     return data["primary"];
   }
@@ -111,6 +115,7 @@ class ApiHelper {
 
 //Get Specific Detail
   Future<Map> cameoDetail(id) async {
+    log(id.toString());
     var userId = await FlutterSecureStorage().read(key: "user_id");
     print('calling: $baseUrl${endPoints["cameo_detail"]}');
     http.Response response = await http.post(
@@ -161,6 +166,19 @@ class ApiHelper {
         data: body,
       );
       print(response.data);
+      if (response.data["message"] == 'SUCCESS') {
+        User currentUser = Get.find<User>();
+        currentUser.country = country;
+        currentUser.address = address;
+        currentUser.city = city;
+        currentUser.fullname = fullname;
+        currentUser.profession = profession;
+        currentUser.description = description;
+        currentUser.langSpeaks = language;
+        currentUser.zipcode = zipcode;
+        currentUser.contact = phone;
+        currentUser.stateName = state;
+      }
       return response.data["message"] == 'SUCCESS' ? true : false;
     } catch (e) {
       scaffoldKey.currentState.removeCurrentSnackBar();
@@ -644,8 +662,38 @@ class ApiHelper {
     var convertedResponse = jsonDecode(response.body);
     if (convertedResponse["status"] == true) {
       Get.back();
-
       Get.to(() => PaymentStatusScreen(), arguments: {"payment_status": true});
+    }
+  }
+
+  Future<NotificationList> notification() async {
+    var userId = await FlutterSecureStorage().read(key: "user_id");
+    http.Response response =
+        await http.get("${baseUrl}/gigs/get_notification_count/$userId");
+    var data = jsonDecode(response.body);
+    NotificationList notificationList = NotificationList();
+    if (data["total_count"] > 0) {
+      for (var notification in data["data"]) {
+        CameoNotification cameoNotification = CameoNotification(
+            message: notification[3],
+            id: notification[0],
+            event: notification[2],
+            sendEvent: notification[1]);
+        notificationList.addNotification(cameoNotification);
+      }
+    }
+    return notificationList;
+  }
+
+  Future<bool> markNotificationSeen(
+      {String notificationId, String sendEvent}) async {
+    http.Response response = await http.get(
+        "$baseUrl/gigs/change_notification_status/$notificationId?sts=$sendEvent");
+    var data = jsonDecode(response.body);
+    if (data["message"] == "SUCCESS") {
+      return true;
+    } else {
+      return false;
     }
   }
 }

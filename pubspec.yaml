@@ -51,6 +51,7 @@ dependencies:
   stripe_payment: ^1.0.11
   flutter_credit_card: ^0.1.4
   lottie:
+  flutter_local_notifications:
 
 dev_dependencies:
   flutter_test:

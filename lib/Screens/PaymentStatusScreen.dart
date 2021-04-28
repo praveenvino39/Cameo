@@ -1,5 +1,4 @@
 import 'package:cameo/constants.dart';
-import 'package:cameo/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';

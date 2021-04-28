@@ -5,6 +5,7 @@ import 'package:cameo/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+// ignore: implementation_imports
 import 'package:flutter/src/material/refresh_indicator.dart' as baseRefresh;
 
 class EditVideoScreen extends StatefulWidget {

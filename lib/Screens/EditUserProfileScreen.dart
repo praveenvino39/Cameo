@@ -1,9 +1,7 @@
-import 'package:cameo/Widgets/Popups%20and%20Dialogs/ProfilePictureSheet.dart';
 import 'package:cameo/Widgets/Tabs/GeneralDetailTab.dart';
 import 'package:cameo/Widgets/Tabs/PasswordUpdateTab.dart';
 import 'package:cameo/Widgets/Tabs/PaymentUpdateTab.dart';
 import 'package:cameo/constants.dart';
-import 'package:cameo/utils.dart';
 import 'package:flutter/material.dart';
 
 class EditUserProfileScreen extends StatefulWidget {

@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cameo/Network/networkHelper.dart';
-import 'package:cameo/Screens/CameoDetailScreen.dart';
 import 'package:cameo/Screens/EditVideoScreen.dart';
 import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
 import 'package:cameo/constants.dart';

@@ -5,7 +5,6 @@ import 'dart:io' as os;
 import 'package:cameo/Network/PaypalPayment.dart';
 import 'package:cameo/Network/stripe/StripeCardScreen.dart';
 import 'package:cameo/Screens/PaymentStatusScreen.dart';
-import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
 import 'package:cameo/constants.dart';
 import 'package:cameo/models/cameo_model.dart';
 import 'package:cameo/models/notification_model.dart';
@@ -135,6 +134,7 @@ class ApiHelper {
     return data["message"];
   }
 
+  // ignore: missing_return
   Future<bool> updateUserDetail(
       {id,
       GlobalKey<ScaffoldState> scaffoldKey,
@@ -189,6 +189,7 @@ class ApiHelper {
     }
   }
 
+  // ignore: missing_return
   Future<Map> updatePassword(
       {String currentPassword, String newPassword}) async {
     var userId = await FlutterSecureStorage().read(key: "user_id");
@@ -208,6 +209,7 @@ class ApiHelper {
     }
   }
 
+  // ignore: missing_return
   Future<List> getPaymentDetail() async {
     var userId = await FlutterSecureStorage().read(key: "user_id");
     try {
@@ -220,6 +222,7 @@ class ApiHelper {
     }
   }
 
+  // ignore: missing_return
   Future<Map> updatePayment(
       {paypalEmail,
       accountNumber,
@@ -259,6 +262,7 @@ class ApiHelper {
     }
   }
 
+  // ignore: missing_return
   Future<Map> activities() async {
     var userId = await FlutterSecureStorage().read(key: "user_id");
     try {
@@ -308,6 +312,7 @@ class ApiHelper {
     return data["data"];
   }
 
+  // ignore: missing_return
   Future<Map> postCameo(
     context,
     scaffoldState, {
@@ -424,6 +429,7 @@ class ApiHelper {
     return data;
   }
 
+  // ignore: missing_return
   Future<Map> changeOrderStatusBuyer({orderId, orderStatus}) async {
     http.Response response =
         await http.post("$baseUrl${endPoints['order_status_buyer']}", body: {
@@ -437,6 +443,7 @@ class ApiHelper {
     }
   }
 
+  // ignore: missing_return
   Future<List> myCameo() async {
     var userId = await FlutterSecureStorage().read(key: "user_id");
     print('$baseUrl${endPoints["my_cameo"]}$userId');
@@ -521,6 +528,7 @@ class ApiHelper {
     //  /gigs/update_video/86?video=uploads/gigs_videos/1614349951SampleVideo_1280x720_1mb.mp4
   }
 
+  // ignore: missing_return
   Future<Map> uploadVideo({FilePickerResult vid, String gigId}) async {
     var videoArray = vid.files.first.path;
     int splitIndex = vid.files.first.path.lastIndexOf('/');

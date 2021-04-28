@@ -1,13 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cameo/Network/networkHelper.dart';
-import 'package:cameo/Widgets/FilterDropDown.dart';
 import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
 import 'package:cameo/constants.dart';
 import 'package:cameo/utils.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class MyPurchaseScreen extends StatefulWidget {
   @override

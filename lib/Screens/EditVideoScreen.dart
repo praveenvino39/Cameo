@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:cameo/Network/networkHelper.dart';
 import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
 import 'package:cameo/Widgets/VideoPlayerWidget.dart';
@@ -7,11 +5,7 @@ import 'package:cameo/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter/src/material/refresh_indicator.dart' as baseRefresh;
-import 'package:path_provider/path_provider.dart';
-import 'package:video_compress/video_compress.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 class EditVideoScreen extends StatefulWidget {
   final List videoList;

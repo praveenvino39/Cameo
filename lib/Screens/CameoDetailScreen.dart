@@ -46,16 +46,19 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
               future: cameoController.getCameobyId(gigId: cameoId),
               builder: (context, snapshot) {
                 cameo = snapshot.data;
+
                 if (snapshot.hasData) {
-                  Uri youtubeVideoId =
-                      Uri.parse('https://www.youtube.com/watch?v=i74Lxs9Zjhg');
-                  _controller = YoutubePlayerController(
-                    initialVideoId: youtubeVideoId.queryParameters["v"],
-                    flags: YoutubePlayerFlags(
-                      autoPlay: false,
-                      mute: false,
-                    ),
-                  );
+                  if (cameo.gigsDetails.youtubeUrl.length > 3) {
+                    Uri youtubeVideoId = Uri.parse(
+                        'https://www.youtube.com/watch?v=i74Lxs9Zjhg');
+                    _controller = YoutubePlayerController(
+                      initialVideoId: youtubeVideoId.queryParameters["v"],
+                      flags: YoutubePlayerFlags(
+                        autoPlay: false,
+                        mute: false,
+                      ),
+                    );
+                  }
                   return SingleChildScrollView(
                     child: Column(
                       children: [
@@ -162,54 +165,65 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset('assets/images/youtube.svg'),
-                                  width(10.0),
-                                  Text(
-                                    "Youtube",
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.white),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Container(
-                                child: YoutubePlayer(
-                                    controller: _controller,
-                                    showVideoProgressIndicator: true,
-                                    progressColors: ProgressBarColors(
-                                      playedColor: kSecondaryColor,
-                                      handleColor: kSecondaryColor,
-                                    )),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: Row(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/images/vimeo.svg',
-                                    width: 40,
-                                  ),
-                                  width(10.0),
-                                  Text(
-                                    "Vimeo",
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.white),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              height: 300,
-                              child:
-                                  VimeoPlayer(id: '395212534', autoPlay: false),
-                            ),
+                            cameo.gigsDetails.youtubeUrl.length > 3
+                                ? Padding(
+                                    padding: const EdgeInsets.only(left: 10.0),
+                                    child: Row(
+                                      children: [
+                                        SvgPicture.asset(
+                                            'assets/images/youtube.svg'),
+                                        width(10.0),
+                                        Text(
+                                          "Youtube",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : width(0.0),
+                            cameo.gigsDetails.youtubeUrl.length > 3
+                                ? Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Container(
+                                      child: YoutubePlayer(
+                                          controller: _controller,
+                                          showVideoProgressIndicator: true,
+                                          progressColors: ProgressBarColors(
+                                            playedColor: kSecondaryColor,
+                                            handleColor: kSecondaryColor,
+                                          )),
+                                    ),
+                                  )
+                                : width(0.0),
+                            cameo.gigsDetails.vimeoUrl.length > 3
+                                ? Padding(
+                                    padding: const EdgeInsets.only(left: 10.0),
+                                    child: Row(
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/images/vimeo.svg',
+                                          width: 40,
+                                        ),
+                                        width(10.0),
+                                        Text(
+                                          "Vimeo",
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : width(0.0),
+                            cameo.gigsDetails.youtubeUrl.length > 3
+                                ? Container(
+                                    height: 300,
+                                    child: VimeoPlayer(
+                                        id: '395212534', autoPlay: false),
+                                  )
+                                : width(0.0),
                             Container(
                               height: 200,
                               child: ListView.builder(

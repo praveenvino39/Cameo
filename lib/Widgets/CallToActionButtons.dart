@@ -1,8 +1,4 @@
 import 'package:cameo/Network/networkHelper.dart';
-import 'package:cameo/Network/paytabs/PaytabScreen.dart';
-import 'package:cameo/Network/paytabs/PaytabWebView.dart';
-import 'package:cameo/Network/stripe/StripeCardScreen.dart';
-import 'package:cameo/Network/stripe/StripePaymentService.dart';
 import 'package:cameo/Screens/CameoDetailScreen.dart';
 import 'package:cameo/Screens/ChatScreen.dart';
 import 'package:get/get.dart';
@@ -12,7 +8,6 @@ import 'package:cameo/models/cameo_model.dart';
 import 'package:cameo/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:stripe_payment/stripe_payment.dart';
 import '../constants.dart';
 import '../utils.dart';
 
@@ -106,25 +101,26 @@ Widget callToActionButtons({Cameo cameo, User user}) {
               padding:
                   const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10),
               child: Container(
-                  width: double.infinity,
-                  height: 40,
-                  clipBehavior: Clip.hardEdge,
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(5)),
-                  child: FlatButton(
-                    onPressed: () async {
-                      Get.to(() => ChatScreen(), arguments: {
-                        "username": cameo.gigsDetails.username,
-                        "user_id": cameo.gigsDetails.userId
-                      });
-                    },
-                    child: Text(
-                      'Chat ',
-                      style: kAuthTitleStyle.copyWith(
-                          color: Colors.white, fontSize: 16),
-                    ),
-                    color: Color(0xffff037c),
-                  )),
+                width: double.infinity,
+                height: 40,
+                clipBehavior: Clip.hardEdge,
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(5)),
+                child: FlatButton(
+                  onPressed: () async {
+                    Get.to(() => ChatScreen(), arguments: {
+                      "username": cameo.gigsDetails.username,
+                      "user_id": cameo.gigsDetails.userId
+                    });
+                  },
+                  child: Text(
+                    'Chat ',
+                    style: kAuthTitleStyle.copyWith(
+                        color: Colors.white, fontSize: 16),
+                  ),
+                  color: Color(0xffff037c),
+                ),
+              ),
             )
           : width(10.0),
       height(30.0),

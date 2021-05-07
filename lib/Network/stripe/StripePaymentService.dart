@@ -78,6 +78,7 @@ class StripeService {
       "shipping[address][state]": currentUser.stateName,
       "shipping[address][country]": currentUser.countryName,
     });
+    log("${currentUser.address}");
     if (response.statusCode == 200) {
       Map paymentIntentResponse = jsonDecode(response.body);
       paymentIntent = PaymentIntent(

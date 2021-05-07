@@ -1,9 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cameo/Network/networkHelper.dart';
 import 'package:cameo/Widgets/FilterDropDown.dart';
+import 'package:cameo/Widgets/Loading%20Indicators/LoadingIndicator.dart';
 import 'package:cameo/constants.dart';
 import 'package:cameo/utils.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRangePicker;
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:cameo/Network/networkHelper.dart';
 import 'package:intl/intl.dart';
 
 class MyPaymentScreen extends StatefulWidget {
@@ -15,6 +20,8 @@ class _MyPaymentScreenState extends State<MyPaymentScreen> {
   List<DateTime> dateRange;
   String from, to;
   List<String> dropDownItems = ['Request sent', 'Payment received'];
+  ApiHelper apiHelper = ApiHelper();
+  List data = [].obs;
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -30,95 +37,196 @@ class _MyPaymentScreenState extends State<MyPaymentScreen> {
           appBar: AppBar(
             title: Text('My Payments'),
           ),
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              FlatButton(
-                color: Colors.pinkAccent,
-                onPressed: () async {
-                  dateRange = await DateRangePicker.showDatePicker(
-                    context: context,
-                    initialFirstDate: DateTime.now(),
-                    initialLastDate: DateTime.now(),
-                    firstDate: DateTime(2020, 1),
-                    lastDate: DateTime.now(),
-                  );
-                  setState(() {
-                    from = DateFormat('yMMMd').format(dateRange[0]);
-                    to = DateFormat('yMMMd').format(dateRange[1]);
-                  });
-                },
-                child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Icon(
-                    Icons.date_range,
-                    color: Colors.white,
-                  ),
-                  width(10.0),
-                  Text(
-                    "Select date range",
-                    style: TextStyle(color: Colors.white),
-                  )
-                ]),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  to != null
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "From: $from",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 15),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                "To: $to",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 15),
-                              ),
-                            ),
-                          ],
-                        )
-                      : Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
-                          child: Text(
-                            "All",
-                            style: TextStyle(color: Colors.white, fontSize: 15),
+          body: FutureBuilder(
+              future: apiHelper.activities(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  data = snapshot.data["my_payments"];
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          child: ListView.builder(
+                            itemCount: data.length,
+                            itemBuilder: (context, index) => ListTile(
+                                tileColor: Colors.white,
+                                title: Text(
+                                    titleCase(string: data[index]["title"])),
+                                leading: Icon(Icons.monetization_on),
+                                trailing: Text(
+                                    "${data[index]["currency_sign"]}${data[index]["amount"]}"),
+                                onTap: () => showModalBottomSheet(
+                                    context: context,
+                                    builder: (context) => StatefulBuilder(
+                                          builder: (context, newSetState) =>
+                                              BottomSheet(
+                                            onClosing: () =>
+                                                Navigator.pop(context),
+                                            builder: (context) => Container(
+                                              height: Get.height / 3,
+                                              padding: EdgeInsets.all(16.0),
+                                              color: Colors.white,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  CircleAvatar(
+                                                    radius: 25,
+                                                    backgroundImage:
+                                                        CachedNetworkImageProvider(
+                                                            "$domainUrl/${data[index]["gig_image_thumb"]}"),
+                                                  ),
+                                                  height(12.0),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            '#${data[index]["order_id"]}',
+                                                            style: TextStyle(
+                                                                fontSize: 18,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          height(5.0),
+                                                          Text(data[index]
+                                                              ["created_date"])
+                                                        ],
+                                                      ),
+                                                      data[index]["payment_status"] !=
+                                                              "0"
+                                                          ? Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            100),
+                                                                color:
+                                                                    Colors.blue,
+                                                              ),
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          10,
+                                                                      vertical:
+                                                                          4),
+                                                              child: Text(
+                                                                data[index][
+                                                                    "withdraw_message"],
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                            )
+                                                          : RaisedButton(
+                                                              onPressed:
+                                                                  () async {
+                                                                loading(
+                                                                    context);
+                                                                var resData = await apiHelper
+                                                                    .withdrawRequest(
+                                                                        order_id:
+                                                                            data[index]["order_id"]);
+                                                                data[index][
+                                                                        "withdraw_message"] =
+                                                                    resData["data"]
+                                                                        ["msg"];
+                                                                if (resData[
+                                                                        "status"] ==
+                                                                    true)
+                                                                  newSetState(
+                                                                      () => {
+                                                                            data[index]["withdraw_message"] =
+                                                                                "Request Sent",
+                                                                            data[index]["payment_status"] =
+                                                                                "1",
+                                                                          });
+
+                                                                Get.back();
+                                                              },
+                                                              child: Text(
+                                                                "Withdraw",
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ),
+                                                              color:
+                                                                  kSecondaryColor,
+                                                            ),
+                                                    ],
+                                                  ),
+                                                  height(12.0),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text("Product Name",
+                                                          style: TextStyle(
+                                                              fontSize: 15,
+                                                              color: Colors.grey
+                                                                  .shade800,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                      Text(data[index]["title"],
+                                                          style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                    ],
+                                                  ),
+                                                  height(12.0),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text("Grand Total",
+                                                          style: TextStyle(
+                                                              fontSize: 15,
+                                                              color: Colors.grey
+                                                                  .shade800,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                      Text(
+                                                          '${data[index]["currency_sign"]}${data[index]["amount"]}',
+                                                          style: TextStyle(
+                                                              fontSize: 18,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold)),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ))),
                           ),
                         ),
-                  FilterDropDown(
-                    items: dropDownItems,
-                    onChanged: (value) => {print(value)},
-                  )
-                ],
-              ),
-              Expanded(
-                child: Container(
-                  child: ListView.builder(
-                      itemBuilder: (context, index) => ListTile(
-                          tileColor: Colors.white,
-                          title: Text("New Payment"),
-                          leading: Icon(Icons.monetization_on),
-                          trailing: Text("\$70"),
-                          onTap: () => showModalBottomSheet(
-                              context: context,
-                              builder: (context) => BottomSheet(
-                                    onClosing: () => Navigator.pop(context),
-                                    builder: (context) => Center(
-                                      child: Text("New Sales"),
-                                    ),
-                                  )))),
-                ),
-              )
-            ],
-          ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              }),
         ),
       ),
     );

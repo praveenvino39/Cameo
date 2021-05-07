@@ -18,9 +18,8 @@ import 'package:http/http.dart' as http;
 
 import '../utils.dart';
 
-// http://ec2-54-189-124-142.us-west-2.compute.amazonaws.com/
 const baseUrl = 'https://cameo.deliveryventure.com/api';
-const domainUrl = 'https://cameo.deliveryventure.com';
+const domainUrl = 'https://cameo.deliveryventure.com/';
 
 const endPoints = {
   //authentication and authorization
@@ -99,7 +98,6 @@ class ApiHelper {
   Future<List> popularCameos() async {
     print('calling: $baseUrl${endPoints["popular"]}');
     http.Response response = await http.get('$baseUrl${endPoints["popular"]}');
-    log(response.body);
     var data = jsonDecode(response.body);
     return data["primary"];
   }
@@ -268,7 +266,7 @@ class ApiHelper {
     try {
       dio.Response response =
           await dio.Dio().get('$baseUrl${endPoints["activities"]}$userId');
-      print(response.data);
+      print(response.data["my_payments"]);
       return response.data["data"];
     } catch (e) {
       print(e.toString());
@@ -568,8 +566,7 @@ class ApiHelper {
             valueColor: AlwaysStoppedAnimation(kSecondaryColor),
           ),
         ));
-    var response = await http
-        .post("https://cameo.deliveryventure.com/api/gigs/save_payment", body: {
+    var response = await http.post("$baseUrl/gigs/save_payment", body: {
       "gigs_id": cameo.gigsDetails.id,
       "seller_id": cameo.gigsDetails.userId,
       "USERID": user.userid,
@@ -657,9 +654,8 @@ class ApiHelper {
 
   void updateStripePaymentSuccess(
       {String itemNumber, String serverResponse}) async {
-    var mock =
-        '{"id":"pi_1IZaHsGDJI6B9tkqeoYOnXvW","object":"payment_intent","amount":500,"amount_capturable":0,"amount_received":500,"application":null,"application_fee_amount":null,"canceled_at":null,"cancellation_reason":null,"capture_method":"automatic","charges":{"object":"list","data":[{"id":"ch_1IZaHtGDJI6B9tkqS194z0WY","object":"charge","amount":500,"amount_captured":500,"amount_refunded":0,"application":null,"application_fee":null,"application_fee_amount":null,"balance_transaction":"txn_1IZaHuGDJI6B9tkqYoxN5MOr","billing_details":{"address":{"city":null,"country":null,"line1":null,"line2":null,"postal_code":null,"state":null},"email":null,"name":null,"phone":null},"calculated_statement_descriptor":"Stripe","captured":true,"created":1616844401,"currency":"usd","customer":null,"description":"ernie hudson","destination":null,"dispute":null,"disputed":false,"failure_code":null,"failure_message":null,"fraud_details":{},"invoice":null,"livemode":false,"metadata":{},"on_behalf_of":null,"order":null,"outcome":{"network_status":"approved_by_network","reason":null,"risk_level":"normal","risk_score":3,"seller_message":"Payment complete.","type":"authorized"},"paid":true,"payment_intent":"pi_1IZaHsGDJI6B9tkqeoYOnXvW","payment_method":"pm_1IZaHsGDJI6B9tkqk7GewfJy","payment_method_details":{"card":{"brand":"visa","checks":{"address_line1_check":null,"address_postal_code_check":null,"cvc_check":"pass"},"country":"US","exp_month":12,"exp_year":2023,"fingerprint":"fJKsaPQeF9Uo9rbT","funding":"credit","installments":null,"last4":"4242","network":"visa","three_d_secure":null,"wallet":null},"type":"card"},"receipt_email":null,"receipt_number":null,"receipt_url":"https://pay.stripe.com/receipts/acct_1Fm42FGDJI6B9tkq/ch_1IZaHtGDJI6B9tkqS194z0WY/rcpt_JByEKz2BqurDgwaewFTAsQaH4H1Was0","refunded":false,"refunds":{"object":"list","data":[],"has_more":false,"total_count":0,"url":"/v1/charges/ch_1IZaHtGDJI6B9tkqS194z0WY/refunds"},"review":null,"shipping":{"address":{"city":"Chennai","country":"Angola","line1":"12, new york, us","line2":null,"postal_code":"600035","state":"Chennai"},"carrier":null,"name":"Demouser","phone":null,"tracking_number":null},"source":null,"source_transfer":null,"statement_descriptor":null,"statement_descriptor_suffix":null,"status":"succeeded","transfer_data":null,"transfer_group":null}],"has_more":false,"total_count":1,"url":"/v1/charges?payment_intent=pi_1IZaHsGDJI6B9tkqeoYOnXvW"},"client_secret":"pi_1IZaHsGDJI6B9tkqeoYOnXvW_secret_IzhCSmYsZV4AUYYOO9SKWPESD","confirmation_method":"automatic","created":1616844400,"currency":"usd","customer":null,"description":"ernie hudson","invoice":null,"last_payment_error":null,"livemode":false,"metadata":{},"next_action":null,"on_behalf_of":null,"payment_method":"pm_1IZaHsGDJI6B9tkqk7GewfJy","payment_method_options":{"card":{"installments":null,"network":null,"request_three_d_secure":"automatic"}},"payment_method_types":["card"],"receipt_email":null,"review":null,"setup_future_usage":null,"shipping":{"address":{"city":"Chennai","country":"Angola","line1":"12, new york, us","line2":null,"postal_code":"600035","state":"Chennai"},"carrier":null,"name":"Demouser","phone":null,"tracking_number":null},"source":null,"statement_descriptor":null,"statement_descriptor_suffix":null,"status":"succeeded","transfer_data":null,"transfer_group":null}';
     // Map convertedJson = jsonDecode(serverResponse);
+    print(itemNumber);
     http.Response response = await http.post("$baseUrl/gigs/pay_success",
         body: {
           "item_number": itemNumber,
@@ -679,6 +675,7 @@ class ApiHelper {
     http.Response response =
         await http.get("${baseUrl}/gigs/get_notification_count/$userId");
     var data = jsonDecode(response.body);
+    print(data);
     NotificationList notificationList = NotificationList();
     if (data["total_count"] > 0) {
       for (var notification in data["data"]) {
@@ -703,5 +700,37 @@ class ApiHelper {
     } else {
       return false;
     }
+  }
+
+  Future withdrawRequest({String order_id}) async {
+    var userId = await FlutterSecureStorage().read(key: "user_id");
+    http.Response response = await http.post(
+        "$baseUrl/gigs/withdram_payment_request/$userId",
+        body: {"order_id": order_id});
+    var data = jsonDecode(response.body);
+    return data;
+  }
+
+  Future<bool> rejectCameo({
+    String order_id,
+    String gig_id,
+    String seller_id,
+    String reject_reason,
+  }) async {
+    var userId = await FlutterSecureStorage().read(key: "user_id");
+    http.Response response =
+        await http.post("$baseUrl/gigs/rejected_orders", body: {
+      "seller_id": seller_id,
+      "user_id": userId,
+      "reject_reason": reject_reason,
+      "order_id": order_id,
+      "gig_id": gig_id
+    });
+    var data = jsonDecode(response.body);
+    log(response.body);
+    if (data["message"] == "SUCCESS")
+      return true;
+    else
+      return false;
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cameo/Network/networkHelper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -21,8 +22,7 @@ class HelpScreenState extends State<HelpScreen> {
       appBar: AppBar(title: Text('Help')),
       body: WebView(
         onPageFinished: (_) async {
-          if (await _controller.currentUrl() ==
-              "https://cameo.deliveryventure.com/api/gigs/test") readJS();
+          if (await _controller.currentUrl() == "$baseUrl/gigs/test") readJS();
         },
         navigationDelegate: (request) {
           if (request.url == "https://cameo.deliveryventure.com/") {
@@ -69,8 +69,8 @@ class HelpScreenState extends State<HelpScreen> {
       "cart_description": "Dummy Order 123456",
       "cart_currency": "USD",
       "cart_amount": "4700",
-      "callback": "https://cameo.deliveryventure.com/",
-      "return": "https://cameo.deliveryventure.com/",
+      "callback": "$baseUrl",
+      "return": "$baseUrl",
       "payment_token": response["message"]["token"].toString(),
       "customer_details": {
         "name": "John Smith",

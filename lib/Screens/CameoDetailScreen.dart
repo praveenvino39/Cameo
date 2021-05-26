@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cameo/Network/networkHelper.dart';
 import 'package:cameo/Widgets/CallToActionButtons.dart';
@@ -229,15 +231,18 @@ class _CameoDetailScreenState extends State<CameoDetailScreen> {
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
                                 itemCount: cameo.videoPath.length,
-                                itemBuilder: (context, index) => Container(
-                                  padding: EdgeInsets.only(right: 10),
-                                  width: 300,
-                                  height: 200,
-                                  child: VideoExample(
-                                    videoUrl: cameo.videoPath[index]
-                                        ["video_path"],
-                                  ),
-                                ),
+                                itemBuilder: (context, index) {
+                                  log(cameo.videoPath[index]["video_path"]);
+                                  return Container(
+                                    padding: EdgeInsets.only(right: 10),
+                                    width: 300,
+                                    height: 200,
+                                    child: VideoExample(
+                                      videoUrl: cameo.videoPath[index]
+                                          ["video_path"],
+                                    ),
+                                  );
+                                },
                               ),
                             )
                           ],

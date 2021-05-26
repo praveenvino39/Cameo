@@ -329,8 +329,11 @@ class ApiHelper {
     int splitIndex = img.path.lastIndexOf('/');
     imageArray = imageArray.substring(splitIndex + 1);
     try {
-      int startIndex = vimeoUrl.lastIndexOf('/') + 1;
-      int vimeoId = int.parse(vimeoUrl.substring(startIndex));
+      int vimeoId;
+      if (vimeoUrl != null) {
+        int startIndex = vimeoUrl.lastIndexOf('/') + 1;
+        vimeoId = int.parse(vimeoUrl.substring(startIndex));
+      }
       var userId = await FlutterSecureStorage().read(key: "user_id");
       http.MultipartRequest request = http.MultipartRequest(
         'POST',
@@ -355,9 +358,9 @@ class ApiHelper {
         "category_id": 4.toString(),
         "gig_details": gigDetails,
         "currency_type": "USD",
-        "youtube_url": youtubeUrl,
-        "vimeo_url": vimeoUrl,
-        "vimeo_video_id": vimeoId.toString(),
+        "youtube_url": youtubeUrl != null ? youtubeUrl : "",
+        "vimeo_url": vimeoUrl != null ? vimeoUrl : "",
+        "vimeo_video_id": vimeoId == null ? "" : vimeoId.toString(),
         "image_array": imageArray,
         "video_array": "1.mp4",
         "full_country_name": "11",
@@ -367,6 +370,7 @@ class ApiHelper {
       print(data);
       return data;
     } catch (e) {
+      log(e.toString());
       Navigator.pop(context);
       scaffoldState.currentState.showSnackBar(
         SnackBar(

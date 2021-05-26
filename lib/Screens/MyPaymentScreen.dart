@@ -64,7 +64,7 @@ class _MyPaymentScreenState extends State<MyPaymentScreen> {
                                             onClosing: () =>
                                                 Navigator.pop(context),
                                             builder: (context) => Container(
-                                              height: Get.height / 3,
+                                              height: Get.height / 2.5,
                                               padding: EdgeInsets.all(16.0),
                                               color: Colors.white,
                                               child: Column(

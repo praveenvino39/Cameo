@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:cameo/Network/networkHelper.dart';
@@ -10,7 +12,8 @@ import 'package:flutter/physics.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
 
-PickedFile pickedImage, pckvid;
+PickedFile pickedImage;
+PlatformFile pckvid;
 Uint8List pickedImageInt8List, pckvidInt8List;
 
 class SellScreen extends StatefulWidget {
@@ -547,9 +550,7 @@ I understand that late delivery will adversely affect my rankings onCameos And w
                             duration != null &&
                             pckvid != null &&
                             pickedImage != null &&
-                            description != null &&
-                            videoUrl != null &&
-                            vimeoUrl != null) {
+                            description != null) {
                           loading(context);
                           var data = await ApiHelper().postCameo(
                             context,
@@ -567,6 +568,7 @@ I understand that late delivery will adversely affect my rankings onCameos And w
                             // vimeoUrl: "https://vimeo.com/76979871",
                             vimeoUrl: vimeoUrl,
                           );
+                          log(jsonEncode(data));
                           if (data != null) if (data["message"] == "success") {
                             FocusScope.of(context).requestFocus(FocusNode());
                             Navigator.pop(context);
@@ -628,19 +630,20 @@ I understand that late delivery will adversely affect my rankings onCameos And w
                                 content: Text("Image is required"),
                               ),
                             );
-                          } else if (videoUrl == null) {
-                            scaffoldState.currentState.showSnackBar(
-                              SnackBar(
-                                content: Text("Video url is required"),
-                              ),
-                            );
-                          } else if (vimeoUrl == null) {
-                            scaffoldState.currentState.showSnackBar(
-                              SnackBar(
-                                content: Text("Vimeo url is required"),
-                              ),
-                            );
                           }
+                          // else if (videoUrl == null) {
+                          //   scaffoldState.currentState.showSnackBar(
+                          //     SnackBar(
+                          //       content: Text("Video url is required"),
+                          //     ),
+                          //   );
+                          // } else if (vimeoUrl == null) {
+                          //   scaffoldState.currentState.showSnackBar(
+                          //     SnackBar(
+                          //       content: Text("Vimeo url is required"),
+                          //     ),
+                          //   );
+                          // }
                         }
                       },
                 child: Text(
@@ -691,9 +694,11 @@ Future pickImage({context, GlobalKey<ScaffoldState> scaffoldKey}) async {
 }
 
 Future pickVideo({GlobalKey<ScaffoldState> scaffoldKey, context}) async {
-  pckvid = await ImagePicker().getVideo(source: ImageSource.gallery);
+  FilePickerResult pickedVideo = await FilePicker.platform
+      .pickFiles(type: FileType.video, allowMultiple: false);
+  pckvid = pickedVideo.files.first;
   pckvidInt8List = await VideoThumbnail.thumbnailData(
-    video: pckvid.path,
+    video: pickedVideo.files.first.path,
     imageFormat: ImageFormat.JPEG,
     maxWidth: 300,
     quality: 25,

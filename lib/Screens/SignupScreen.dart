@@ -259,6 +259,7 @@ class _SignupScreenState extends State<SignupScreen> {
         "fullname": fullname,
         "username": username,
         "email": email,
+        "password": password,
         "country": countryId.toString(),
         "state": stateId.toString()
       });

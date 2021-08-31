@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "668128996701",
+    "project_id": "bigup-4df79",
+    "storage_bucket": "bigup-4df79.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:668128996701:android:1c8d9c93c5e1f6dbdf8cb4",
+        "android_client_info": {
+          "package_name": "com.bigups.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "668128996701-hbq66f4vnehvvh5neb42olv47qsagb85.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bigups.app",
+            "certificate_hash": "10ea57223b0cb8381488a149f424c242f06ed6fc"
+          }
+        },
+        {
+          "client_id": "668128996701-05bpm488denfo1fhgbk9oo56cjn0e5qs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2TS_XoMv1meHXWUb5u5J7295zwaLrxXo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "668128996701-05bpm488denfo1fhgbk9oo56cjn0e5qs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
